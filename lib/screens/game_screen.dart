@@ -9,6 +9,23 @@ import '../managers/game_manager.dart';
 import '../managers/animation_manager.dart';
 
 class GameScreen extends StatefulWidget {
+  // Global constants
+  static const double kFingerSize = 100.0;
+  static const Color kBackgroundColor = Color(0xFF202121);
+  static const Duration kSelectionInterval = Duration(milliseconds: 200);
+  static const double kMaxScale = 1.4;
+  static const double kFinalScale = 1.2;
+  static const double kBorderOpacity = 0.4;
+  
+  // Circle appearance constants
+  static const double kBorderWidth = 3.0;
+  static const double kGlowBlurRadius = 10.0;
+  static const double kGlowSpreadRadius = 5.0;
+  static const double kGlowOpacity = 0.3;
+  static const double kDarkenedOpacity = 0.5;
+  static const double kHighlightBorderOpacity = 0.8;
+  static const double kPulseScaleFactor = 0.1;
+
   const GameScreen({super.key});
 
   @override
@@ -26,11 +43,11 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   static const Duration kFingerTapAnimationDuration = FingerTapAnimation.duration;
   static const Duration kWinAnimationDuration = WinnerAnimation.duration;
   static const Duration kPulseAnimationDuration = Duration(milliseconds: 1000);
-  static const double fingerSize = 100.0;
 
   late GameManager _gameManager;
   late AnimationManager _animationManager;
   late ConfettiController _confettiController;
+  bool _isInteractionEnabled = true;
 
   @override
   void initState() {
@@ -68,7 +85,9 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   }
 
   void _onStartSelection() {
-    setState(() {});
+    setState(() {
+      _isInteractionEnabled = false;
+    });
     _animationManager.startSelectionAnimation();
   }
 
@@ -83,7 +102,9 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   }
 
   void _onReset() {
-    setState(() {});
+      setState(() {
+      _isInteractionEnabled = true;
+    });
     _animationManager.reset();
     _confettiController.stop();
   }
@@ -107,8 +128,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
             animation: _animationManager.winAnimationController,
             builder: (context, child) {
               final backgroundColor = _gameManager.isWinAnimationPlaying && selectedColor != null
-                  ? Color.lerp(const Color(0xFF303030), selectedColor, _animationManager.winAnimationController.value)
-                  : const Color(0xFF303030);
+                  ? Color.lerp(const Color(0xFF202121), selectedColor, _animationManager.winAnimationController.value)
+                  : const Color(0xFF202121);
               
               return Container(
                 color: backgroundColor,
@@ -116,8 +137,9 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                   children: [
                     // Fingers
                     ..._gameManager.fingers.entries.map((entry) {
+                      final fingerIndex = _gameManager.fingers.keys.toList().indexOf(entry.key);
                       final isSelected = _gameManager.isSelecting && 
-                          _gameManager.fingers.keys.toList()[_gameManager.currentFingerIndex] == entry.key;
+                          _gameManager.currentFingerIndex == fingerIndex;
                       final animation = _animationManager.fingerAnimationControllers[entry.key];
                       final isWinner = _gameManager.selectedFinger == entry.key;
 
@@ -134,8 +156,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                       }
 
                       return Positioned(
-                        left: entry.value.dx - fingerSize / 2,
-                        top: entry.value.dy - fingerSize / 2,
+                        left: entry.value.dx - GameScreen.kFingerSize / 2,
+                        top: entry.value.dy - GameScreen.kFingerSize / 2,
                         child: AnimatedBuilder(
                           animation: Listenable.merge([
                             animation ?? const AlwaysStoppedAnimation(1.0),
@@ -238,22 +260,22 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
           // Gesture Detector and UI
           GestureDetector(
             behavior: HitTestBehavior.translucent,
-        onPanDown: (details) {
+            onPanDown: _isInteractionEnabled ? (details) {
               if (_gameManager.isSelecting || _gameManager.selectedFinger != null) return;
               
               final pointerCount = _gameManager.fingers.length + 1;
               _gameManager.addFinger(pointerCount, details.localPosition);
               _animationManager.addFingerAnimation(pointerCount);
               setState(() {});
-            },
-            onPanUpdate: (details) {
+            } : null,
+            onPanUpdate: _isInteractionEnabled ? (details) {
               if (_gameManager.isSelecting || _gameManager.selectedFinger != null) return;
               if (_gameManager.fingers.isNotEmpty) {
                 _gameManager.updateFingerPosition(_gameManager.fingers.keys.last, details.localPosition);
                 setState(() {});
               }
-            },
-            onPanCancel: () {
+            } : null,
+            onPanCancel: _isInteractionEnabled ? () {
               if (_gameManager.isSelecting || _gameManager.selectedFinger != null) return;
               if (_gameManager.fingers.isNotEmpty) {
                 final lastKey = _gameManager.fingers.keys.last;
@@ -261,8 +283,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                 _animationManager.removeFingerAnimation(lastKey);
                 setState(() {});
               }
-            },
-            onPanEnd: (details) {
+            } : null,
+            onPanEnd: _isInteractionEnabled ? (details) {
               if (_gameManager.isSelecting || _gameManager.selectedFinger != null) return;
               if (_gameManager.fingers.isNotEmpty) {
                 final lastKey = _gameManager.fingers.keys.last;
@@ -270,12 +292,12 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                 _animationManager.removeFingerAnimation(lastKey);
                 setState(() {});
               }
-        },
-        child: Container(
+            } : null,
+            child: Container(
               width: double.infinity,
               height: double.infinity,
-          child: Stack(
-            children: [
+              child: Stack(
+                children: [
                   if (!_gameManager.isSelecting && _gameManager.selectedFinger == null && _gameManager.fingers.length < 2)
                     Align(
                       alignment: const Alignment(0, -0.3),
@@ -286,35 +308,35 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             width: maxWidth,
                             child: FittedBox(
                               fit: BoxFit.contain,
-                  child: Text(
+                              child: Text(
                                 'PUT FINGERS ON',
                                 style: const TextStyle(
-                      color: Colors.white,
+                                  color: Colors.white,
                                   fontFamily: 'LuckiestGuy',
                                   height: 1,
-                    ),
-                  ),
-                ),
+                                ),
+                              ),
+                            ),
                           );
                         },
                       ),
                     ),
                   if (!_gameManager.isSelecting && _gameManager.selectedFinger == null && _gameManager.fingers.length >= 2)
-                Center(
+                    Center(
                       child: Text(
                         _gameManager.countdown.toString(),
                         style: const TextStyle(
-                        color: Colors.white,
+                          color: Colors.white,
                           fontSize: 72,
                           fontFamily: 'LuckiestGuy',
                         ),
                       ),
                     ),
                 ],
-                    ),
-                  ),
-                ),
-            ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

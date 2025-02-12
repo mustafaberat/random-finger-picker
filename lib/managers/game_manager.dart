@@ -10,6 +10,7 @@ class GameManager {
   final Map<int, Offset> fingers = {};
   final Map<int, Color> fingerColors = {};
   Timer? _waitTimer;
+  Timer? _selectionTimer;
   bool isSelecting = false;
   int? selectedFinger;
   int currentFingerIndex = 0;
@@ -30,6 +31,7 @@ class GameManager {
 
   void dispose() {
     _waitTimer?.cancel();
+    _selectionTimer?.cancel();
   }
 
   void addFinger(int fingerKey, Offset position) {
@@ -77,7 +79,34 @@ class GameManager {
     if (fingers.isEmpty) return;
     isSelecting = true;
     currentFingerIndex = 0;
+    
+    // Start cycling through fingers
+    _cycleFingers();
     onStartSelection();
+  }
+
+  void _cycleFingers() {
+    if (!isSelecting) return;
+    
+    _selectionTimer?.cancel();
+    // Update current finger index
+    _selectionTimer = Timer.periodic(const Duration(milliseconds: 200), (timer) {
+      if (!isSelecting) {
+        timer.cancel();
+        return;
+      }
+      
+      currentFingerIndex = (currentFingerIndex + 1) % fingers.length;
+      onStartSelection();
+    });
+
+    // Stop selection after 2 seconds
+    Future.delayed(const Duration(milliseconds: 2000), () {
+      _selectionTimer?.cancel();
+      if (isSelecting) {
+        finishSelection();
+      }
+    });
   }
 
   void finishSelection() {

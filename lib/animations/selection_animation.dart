@@ -1,9 +1,9 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import '../screens/game_screen.dart';
 
 class SelectionAnimation {
   static const Duration duration = Duration(milliseconds: 2000);
-  static const double fingerSize = 100.0;
 
   static Widget build({
     required Color color,
@@ -11,71 +11,53 @@ class SelectionAnimation {
     required bool isSelected,
     required double selectionProgress,
   }) {
-    double finalScale = scale;
-    double opacity = 1.0;
-    double ringScale = 1.0;
-    double ringOpacity = 0.0;
-
+    // Use GameScreen constants for consistent appearance
+    final baseOpacity = GameScreen.kDarkenedOpacity;
+    
     if (isSelected) {
-      // Create a pulsing effect for the selected finger
-      final pulsePhase = (selectionProgress * 8) % 1.0;  // Faster pulse
-      final pulseValue = sin(pulsePhase * pi * 2);
+      // Create a smooth highlight effect with faster cycling
+      final cycleProgress = (selectionProgress * 10) % 1.0; // Cycle 10 times during the animation
+      final highlightProgress = Curves.easeInOut.transform(cycleProgress);
       
-      finalScale = scale * (1.2 + 0.1 * pulseValue);
-      ringScale = 1.3 + 0.2 * pulseValue;
-      ringOpacity = 0.8;
-    } else {
-      // Non-selected fingers slightly fade and shrink
-      finalScale = scale * 0.9;
-      opacity = 0.7;
-    }
-
-    return Opacity(
-      opacity: opacity,
-      child: Transform.scale(
-        scale: finalScale,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            // Outer ring for selected finger
-            if (isSelected)
-              Transform.scale(
-                scale: ringScale,
-                child: Container(
-                  width: fingerSize,
-                  height: fingerSize,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white.withOpacity(ringOpacity),
-                      width: 4,
-                    ),
-                  ),
-                ),
-              ),
-            // Main circle with glow
-            Container(
-              width: fingerSize,
-              height: fingerSize,
-              decoration: BoxDecoration(
-                color: color,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.white.withOpacity(isSelected ? 0.8 : 0.3),
-                  width: isSelected ? 4 : 2,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: color.withOpacity(isSelected ? 0.6 : 0.3),
-                    blurRadius: isSelected ? 20 : 10,
-                    spreadRadius: isSelected ? 10 : 5,
-                  ),
-                ],
-              ),
+      return Transform.scale(
+        scale: scale * (1.0 + (GameScreen.kPulseScaleFactor * highlightProgress)),
+        child: Container(
+          width: GameScreen.kFingerSize,
+          height: GameScreen.kFingerSize,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: Colors.white.withOpacity(GameScreen.kHighlightBorderOpacity),
+              width: GameScreen.kBorderWidth,
             ),
-          ],
+            boxShadow: [
+              BoxShadow(
+                color: color.withOpacity(GameScreen.kGlowOpacity * highlightProgress),
+                blurRadius: GameScreen.kGlowBlurRadius,
+                spreadRadius: GameScreen.kGlowSpreadRadius,
+              ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      // Non-selected circles stay darkened but maintain border
+      return Transform.scale(
+        scale: scale,
+        child: Container(
+          width: GameScreen.kFingerSize,
+          height: GameScreen.kFingerSize,
+          decoration: BoxDecoration(
+            color: color.withOpacity(baseOpacity),
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: Colors.white.withOpacity(GameScreen.kBorderOpacity * 0.5),
+              width: GameScreen.kBorderWidth,
+            ),
+          ),
+        ),
+      );
+    }
   }
 } 

@@ -68,14 +68,20 @@ class AnimationManager {
   }
 
   void startSelectionAnimation() {
-    selectionController.forward(from: 0);
+    selectionController
+      ..stop()
+      ..reset()
+      ..forward();
   }
 
   void startWinAnimation() {
+    selectionController.stop();
     winAnimationController.forward(from: 0);
   }
 
   void reset() {
+    selectionController.stop();
+    selectionController.reset();
     winAnimationController.reset();
   }
 

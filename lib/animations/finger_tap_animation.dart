@@ -38,8 +38,8 @@ class FingerTapAnimation {
         children: [
           // Translucent border circle
           Container(
-            width: fingerSize * 1.15,
-            height: fingerSize * 1.15,
+            width: fingerSize * 1.25,
+            height: fingerSize * 1.25,
             decoration: BoxDecoration(
               color: color.withOpacity(borderOpacity),
               shape: BoxShape.circle,
