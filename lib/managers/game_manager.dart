@@ -1,12 +1,9 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import '../screens/game_screen.dart';
 
 class GameManager {
-  static const int kInitialCountdown = 2;
-  static const Duration kWinnerShowDuration = Duration(milliseconds: 3000);
-  static const Duration kGameResetDelay = Duration(seconds: 1);
-
   final Map<int, Offset> fingers = {};
   final Map<int, Color> fingerColors = {};
   Timer? _waitTimer;
@@ -14,7 +11,7 @@ class GameManager {
   bool isSelecting = false;
   int? selectedFinger;
   int currentFingerIndex = 0;
-  int countdown = kInitialCountdown;
+  int countdown = GameScreen.kInitialCountdown;
   bool isWinAnimationPlaying = false;
 
   final VoidCallback onStartSelection;
@@ -45,14 +42,12 @@ class GameManager {
   }
 
   void removeFinger(int fingerKey) {
-    // Don't reorder remaining fingers when removing one
     fingers.remove(fingerKey);
     fingerColors.remove(fingerKey);
     
-    // If we have less than 2 fingers, cancel the timer
     if (fingers.length < 2) {
       _waitTimer?.cancel();
-      countdown = kInitialCountdown;
+      countdown = GameScreen.kInitialCountdown;
       onCountdownChanged(countdown);
     }
   }
@@ -60,7 +55,7 @@ class GameManager {
   void _resetWaitTimer() {
     _waitTimer?.cancel();
     if (fingers.length >= 2) {
-      countdown = kInitialCountdown;
+      countdown = GameScreen.kInitialCountdown;
       onCountdownChanged(countdown);
       
       _waitTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -79,6 +74,11 @@ class GameManager {
     if (fingers.isEmpty) return;
     isSelecting = true;
     currentFingerIndex = 0;
+    
+    // Select the winner at the start
+    final random = Random();
+    final fingerKeys = fingers.keys.toList();
+    selectedFinger = fingerKeys[random.nextInt(fingerKeys.length)];
     
     // Start cycling through fingers
     _cycleFingers();
@@ -104,22 +104,20 @@ class GameManager {
     Future.delayed(const Duration(milliseconds: 2000), () {
       _selectionTimer?.cancel();
       if (isSelecting) {
+        // End on the selected finger
+        currentFingerIndex = fingers.keys.toList().indexOf(selectedFinger!);
+        onStartSelection();
         finishSelection();
       }
     });
   }
 
   void finishSelection() {
-    // Randomly select a winner from available fingers
-    final random = Random();
-    final fingerKeys = fingers.keys.toList();
-    selectedFinger = fingerKeys[random.nextInt(fingerKeys.length)];
-    
     isSelecting = false;
     isWinAnimationPlaying = true;
     onFinishSelection();
 
-    Future.delayed(kGameResetDelay, () {
+    Future.delayed(GameScreen.kGameResetDelay, () {
       reset();
     });
   }
@@ -129,7 +127,7 @@ class GameManager {
     fingerColors.clear();
     selectedFinger = null;
     currentFingerIndex = 0;
-    countdown = kInitialCountdown;
+    countdown = GameScreen.kInitialCountdown;
     isWinAnimationPlaying = false;
     onReset();
   }

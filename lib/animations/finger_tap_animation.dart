@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../screens/game_screen.dart';
 
 class FingerTapAnimation {
-  static const Duration duration = Duration(milliseconds: 300);
+  static const Duration duration = GameScreen.kTapDuration;
 
   static Widget build({
     required Color color,
@@ -38,24 +38,39 @@ class FingerTapAnimation {
 
     return Transform.scale(
       scale: scale * currentScale,
-      child: Container(
-        width: GameScreen.kFingerSize,
-        height: GameScreen.kFingerSize,
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: Colors.white.withOpacity(borderOpacity),
-            width: GameScreen.kBorderWidth,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: color.withOpacity(GameScreen.kGlowOpacity),
-              blurRadius: GameScreen.kGlowBlurRadius,
-              spreadRadius: GameScreen.kGlowSpreadRadius,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Outer border circle
+          Container(
+            width: GameScreen.kFingerSize * GameScreen.kOuterBorderScale,
+            height: GameScreen.kFingerSize * GameScreen.kOuterBorderScale,
+            decoration: BoxDecoration(
+              color: color.withOpacity(borderOpacity * 0.5),
+              shape: BoxShape.circle,
             ),
-          ],
-        ),
+          ),
+          // Main circle
+          Container(
+            width: GameScreen.kFingerSize,
+            height: GameScreen.kFingerSize,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Colors.white.withOpacity(borderOpacity),
+                width: GameScreen.kBorderWidth,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withOpacity(GameScreen.kGlowOpacity),
+                  blurRadius: GameScreen.kGlowBlurRadius,
+                  spreadRadius: GameScreen.kGlowSpreadRadius,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

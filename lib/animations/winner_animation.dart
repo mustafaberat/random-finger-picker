@@ -1,9 +1,10 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import '../screens/game_screen.dart';
 
 class WinnerAnimation {
-  static const Duration duration = Duration(milliseconds: 1500);
-  static const double fingerSize = 100.0;
+  static const Duration duration = GameScreen.kWinDuration;
+
 
   static Widget build({
     required Color color,
@@ -26,8 +27,8 @@ class WinnerAnimation {
     return Transform.scale(
       scale: currentScale,
       child: Container(
-        width: fingerSize,
-        height: fingerSize,
+        width: GameScreen.kFingerSize,
+        height: GameScreen.kFingerSize,
         decoration: BoxDecoration(
           color: color,
           shape: BoxShape.circle,

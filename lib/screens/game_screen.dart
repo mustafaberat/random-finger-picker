@@ -7,24 +7,43 @@ import '../animations/winner_animation.dart';
 import '../animations/selection_animation.dart';
 import '../managers/game_manager.dart';
 import '../managers/animation_manager.dart';
+import '../services/localization_service.dart';
 
 class GameScreen extends StatefulWidget {
   // Global constants
   static const double kFingerSize = 100.0;
   static const Color kBackgroundColor = Color(0xFF202121);
-  static const Duration kSelectionInterval = Duration(milliseconds: 200);
-  static const double kMaxScale = 1.4;
-  static const double kFinalScale = 1.2;
-  static const double kBorderOpacity = 0.4;
   
-  // Circle appearance constants
+  // Game timing
+  static const int kInitialCountdown = 2;
+  static const Duration kWinnerShowDuration = Duration(milliseconds: 3000);
+  static const Duration kGameResetDelay = Duration(seconds: 1);
+  
+  // Animation durations
+  static const Duration kSelectionInterval = Duration(milliseconds: 200);
+  static const Duration kSelectionDuration = Duration(milliseconds: 2000);
+  static const Duration kTapDuration = Duration(milliseconds: 300);
+  static const Duration kWinDuration = Duration(milliseconds: 1500);
+  static const Duration kPulseDuration = Duration(milliseconds: 1000);
+  static const Duration kConfettiDuration = Duration(seconds: 5);
+  
+  // Animation scales
+  static const double kMaxScale = 2.4;
+  static const double kFinalScale = 1.2;
+  static const double kPulseScaleFactor = 0.3;
+  
+  // Circle appearance
   static const double kBorderWidth = 3.0;
+  static const double kOuterBorderWidth = 4.0;
+  static const double kOuterBorderScale = 1.30;
+  static const double kBorderOpacity = 0.4;
+  static const double kHighlightBorderOpacity = 0.8;
+  static const double kDarkenedOpacity = 0.5;
+  
+  // Glow effects
   static const double kGlowBlurRadius = 10.0;
   static const double kGlowSpreadRadius = 5.0;
   static const double kGlowOpacity = 0.3;
-  static const double kDarkenedOpacity = 0.5;
-  static const double kHighlightBorderOpacity = 0.8;
-  static const double kPulseScaleFactor = 0.1;
 
   const GameScreen({super.key});
 
@@ -309,7 +328,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             child: FittedBox(
                               fit: BoxFit.contain,
                               child: Text(
-                                'PUT FINGERS ON',
+                                LocalizationService.instance.getString('put_fingers_on', context),
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontFamily: 'LuckiestGuy',
