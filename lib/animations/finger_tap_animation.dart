@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 class FingerTapAnimation {
-  static const Duration duration = Duration(milliseconds: 400);
+  static const Duration duration = Duration(milliseconds: 200);
   static const double fingerSize = 100.0;
 
   static Widget build({
@@ -12,56 +12,37 @@ class FingerTapAnimation {
     required bool isSelecting,
     required bool isWinAnimationPlaying,
   }) {
-    // Create a two-phase animation using custom curves
-    final firstPhase = tapProgress < 0.5 
-        ? Curves.easeOutBack.transform(tapProgress * 2) 
-        : 1.0;
-    final secondPhase = tapProgress < 0.5 
-        ? 0.0 
-        : Curves.easeInOut.transform((tapProgress - 0.5) * 2);
+    // Two-phase animation: expand then shrink
+    final maxScale = 1.4;
+    final finalRestScale = 1.2;
+    
+    // Calculate scale based on progress
+    final double currentScale;
+    if (tapProgress < 0.5) {
+      // First phase: Expand (0-50% of animation)
+      final expandProgress = Curves.easeOut.transform(tapProgress * 2).clamp(0.0, 1.0);
+      currentScale = 1.0 + ((maxScale - 1.0) * expandProgress);
+    } else {
+      // Second phase: Shrink (50-100% of animation)
+      final shrinkProgress = Curves.easeOut.transform((tapProgress - 0.5) * 2).clamp(0.0, 1.0);
+      currentScale = maxScale - ((maxScale - finalRestScale) * shrinkProgress);
+    }
 
-    // Grow then shrink effect
-    final growScale = 1.0 + (0.4 * firstPhase) - (0.1 * secondPhase);
-    final tapScale = scale * growScale;
-
-    // Border and glow effects
-    final borderOpacity = (1.0 - tapProgress) * 0.5;
-    final borderScale = 1.0 + (0.3 * firstPhase);
-    final glowIntensity = firstPhase * (1.0 - secondPhase);
+    // Border opacity with smooth fade in
+    final borderOpacity = (Curves.easeOut.transform(tapProgress < 0.3 ? tapProgress / 0.3 : 1.0) * 0.4).clamp(0.0, 0.4);
 
     return Transform.scale(
-      scale: tapScale,
+      scale: scale * currentScale,
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Outer glow
+          // Translucent border circle
           Container(
-            width: fingerSize * 1.5,
-            height: fingerSize * 1.5,
+            width: fingerSize * 1.15,
+            height: fingerSize * 1.15,
             decoration: BoxDecoration(
+              color: color.withOpacity(borderOpacity),
               shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: color.withOpacity(0.3 * glowIntensity),
-                  blurRadius: 30,
-                  spreadRadius: 15,
-                ),
-              ],
-            ),
-          ),
-          // Animated border
-          Transform.scale(
-            scale: borderScale,
-            child: Container(
-              width: fingerSize * 1.2,
-              height: fingerSize * 1.2,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: color.withOpacity(borderOpacity),
-                  width: 4,
-                ),
-              ),
             ),
           ),
           // Main circle
@@ -73,26 +54,11 @@ class FingerTapAnimation {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: color.withOpacity(0.4 * glowIntensity),
-                  blurRadius: 20,
-                  spreadRadius: 10,
+                  color: color.withOpacity(0.2),
+                  blurRadius: 10,
+                  spreadRadius: 2,
                 ),
               ],
-            ),
-          ),
-          // Inner highlight
-          Container(
-            width: fingerSize,
-            height: fingerSize,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: RadialGradient(
-                colors: [
-                  Colors.white.withOpacity(0.3 * (1.0 - tapProgress)),
-                  Colors.transparent,
-                ],
-                stops: const [0.0, 0.5],
-              ),
             ),
           ),
         ],
@@ -100,3 +66,4 @@ class FingerTapAnimation {
     );
   }
 }
+
