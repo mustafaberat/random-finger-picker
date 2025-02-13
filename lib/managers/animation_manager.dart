@@ -8,6 +8,7 @@ class AnimationManager {
   late final AnimationController selectionController;
   late final AnimationController winAnimationController;
   late final AnimationController pulseController;
+  bool _isWaitingForWinAnimation = false;
 
   final TickerProvider vsync;
   final VoidCallback onSelectionComplete;

@@ -8,6 +8,7 @@ class GameManager {
   final Map<int, Color> fingerColors = {};
   Timer? _waitTimer;
   Timer? _selectionTimer;
+  Timer? _updateThrottleTimer;
   bool isSelecting = false;
   int? selectedFinger;
   int currentFingerIndex = 0;
@@ -29,16 +30,25 @@ class GameManager {
   void dispose() {
     _waitTimer?.cancel();
     _selectionTimer?.cancel();
+    _updateThrottleTimer?.cancel();
   }
 
   void addFinger(int fingerKey, Offset position) {
+    if (fingers.length >= GameScreen.kMaxFingers) return;
+    
     fingers[fingerKey] = position;
     fingerColors[fingerKey] = _getRandomColor();
     _resetWaitTimer();
   }
 
   void updateFingerPosition(int fingerKey, Offset position) {
-    fingers[fingerKey] = position;
+    if (!fingers.containsKey(fingerKey)) return;
+    
+    // Throttle updates to prevent excessive state changes
+    _updateThrottleTimer?.cancel();
+    _updateThrottleTimer = Timer(const Duration(milliseconds: 16), () {
+      fingers[fingerKey] = position;
+    });
   }
 
   void removeFinger(int fingerKey) {
@@ -130,37 +140,6 @@ class GameManager {
     countdown = GameScreen.kInitialCountdown;
     isWinAnimationPlaying = false;
     onReset();
-  }
-
-  // TODO: Remove this method after testing - This is only for development purposes
-  void addTestFingers(Size screenSize) {
-    // Add some random offset to make it look more natural
-    final random = Random();
-    final padding = 100.0;
-    
-    // Top-left
-    addFinger(1, Offset(
-      padding + random.nextDouble() * 50,
-      padding + random.nextDouble() * 50,
-    ));
-
-    // Top-right
-    addFinger(2, Offset(
-      screenSize.width - padding - random.nextDouble() * 50,
-      padding + random.nextDouble() * 50,
-    ));
-
-    // Bottom-left
-    addFinger(3, Offset(
-      padding + random.nextDouble() * 50,
-      screenSize.height - padding - random.nextDouble() * 50,
-    ));
-
-    // Bottom-right
-    addFinger(4, Offset(
-      screenSize.width - padding - random.nextDouble() * 50,
-      screenSize.height - padding - random.nextDouble() * 50,
-    ));
   }
 
   Color _getRandomColor() {

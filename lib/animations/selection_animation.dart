@@ -11,28 +11,42 @@ class SelectionAnimation {
     required bool isSelected,
     required double selectionProgress,
   }) {
-    // Use GameScreen constants for consistent appearance
     final baseOpacity = GameScreen.kDarkenedOpacity;
     
     if (isSelected) {
-      // Create a smooth highlight effect with dynamic speed
-      final cycleCount = 12.0; // Total number of cycles
+      // Fast selection phase (0-0.6), slow highlight phase (0.6-0.8), final display (0.8-1.0)
+      final isInFastPhase = selectionProgress < 0.6;
+      final isInSlowPhase = selectionProgress >= 0.6 && selectionProgress < 0.8;
+      final isInFinalPhase = selectionProgress >= 0.8;
       
-      // Create a speed curve that starts fast and slows down
-      final speedCurve = Curves.easeIn.transform(selectionProgress);
-      final slowdownFactor = 1.0 - (speedCurve * 0.9); // More dramatic slowdown
+      // Calculate progress for each phase
+      double cycleProgress;
+      double highlightIntensity;
       
-      // Calculate cycle progress with variable speed
-      final cycleProgress = ((selectionProgress * cycleCount * slowdownFactor) % 1.0).clamp(0.0, 1.0);
-      final highlightProgress = Curves.easeInOut.transform(cycleProgress);
+      if (isInFastPhase) {
+        // Fast cycling phase
+        cycleProgress = (selectionProgress / 0.6 * 8.0) % 1.0; // 8 fast cycles
+        highlightIntensity = 1.0;
+      } else if (isInSlowPhase) {
+        // Slow cycling phase with increasing highlight
+        cycleProgress = ((selectionProgress - 0.6) / 0.2 * 2.0) % 1.0; // 2 slow cycles
+        highlightIntensity = ((selectionProgress - 0.6) / 0.2) * 2.0;
+      } else {
+        // Final display phase
+        cycleProgress = 0.0; // Stop at current position
+        highlightIntensity = 2.0 + ((selectionProgress - 0.8) / 0.2) * 1.0; // Extra glow at the end
+      }
       
-      // Increase highlight intensity near the end
-      final finalHighlight = selectionProgress > 0.8 
-          ? Curves.easeIn.transform((selectionProgress - 0.8) * 5) 
-          : 0.0;
+      // Smooth out the cycle progress
+      final smoothProgress = Curves.easeInOut.transform(cycleProgress);
+      
+      // Calculate pulsing effect
+      final pulseEffect = isInFinalPhase 
+          ? sin(selectionProgress * 10 * pi) * 0.2 + 0.8 // Gentle pulse in final phase
+          : smoothProgress;
       
       return Transform.scale(
-        scale: scale * (1.0 + (GameScreen.kPulseScaleFactor * (highlightProgress + finalHighlight))),
+        scale: scale * (1.0 + (GameScreen.kPulseScaleFactor * pulseEffect)),
         child: Stack(
           alignment: Alignment.center,
           children: [
@@ -41,7 +55,7 @@ class SelectionAnimation {
               width: GameScreen.kFingerSize * GameScreen.kOuterBorderScale,
               height: GameScreen.kFingerSize * GameScreen.kOuterBorderScale,
               decoration: BoxDecoration(
-                color: color.withOpacity(GameScreen.kBorderOpacity * 0.5 * (highlightProgress + finalHighlight)),
+                color: color.withOpacity(GameScreen.kBorderOpacity * highlightIntensity),
                 shape: BoxShape.circle,
               ),
             ),
@@ -53,14 +67,14 @@ class SelectionAnimation {
                 color: color,
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: Colors.white.withOpacity(GameScreen.kHighlightBorderOpacity * (1.0 + finalHighlight)),
-                  width: GameScreen.kBorderWidth,
+                  color: Colors.white.withOpacity(GameScreen.kHighlightBorderOpacity * highlightIntensity),
+                  width: GameScreen.kBorderWidth * (isInFinalPhase ? 1.5 : 1.0),
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: color.withOpacity(GameScreen.kGlowOpacity * (highlightProgress + finalHighlight)),
-                    blurRadius: GameScreen.kGlowBlurRadius,
-                    spreadRadius: GameScreen.kGlowSpreadRadius,
+                    color: color.withOpacity(GameScreen.kGlowOpacity * highlightIntensity),
+                    blurRadius: GameScreen.kGlowBlurRadius * (isInFinalPhase ? 1.5 : 1.0),
+                    spreadRadius: GameScreen.kGlowSpreadRadius * (isInFinalPhase ? 1.5 : 1.0),
                   ),
                 ],
               ),

@@ -18,7 +18,7 @@ class WinnerAnimation {
     
     // Smooth scale up animation
     final scaleProgress = Curves.easeInOut.transform(delayedProgress);
-    final targetScale = 25.0; // Large enough to cover the screen
+    final targetScale = 50; // Large enough to cover the screen
     final currentScale = baseScale + (targetScale * scaleProgress);
 
     // Maintain white border but make it thinner as circle grows

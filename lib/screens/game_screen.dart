@@ -13,17 +13,18 @@ class GameScreen extends StatefulWidget {
   // Global constants
   static const double kFingerSize = 100.0;
   static const Color kBackgroundColor = Color(0xFF202121);
+  static const int kMaxFingers = 10; // Maximum number of fingers allowed
   
   // Game timing
-  static const int kInitialCountdown = 2;
+  static const int kInitialCountdown = 5;
   static const Duration kWinnerShowDuration = Duration(milliseconds: 3000);
-  static const Duration kGameResetDelay = Duration(seconds: 1);
+  static const Duration kGameResetDelay = Duration(seconds: 3);
   
   // Animation durations
   static const Duration kSelectionInterval = Duration(milliseconds: 200);
   static const Duration kSelectionDuration = Duration(milliseconds: 2000);
   static const Duration kTapDuration = Duration(milliseconds: 300);
-  static const Duration kWinDuration = Duration(milliseconds: 1500);
+  static const Duration kWinDuration = Duration(milliseconds: 2000);
   static const Duration kPulseDuration = Duration(milliseconds: 1000);
   static const Duration kConfettiDuration = Duration(seconds: 5);
   
@@ -84,15 +85,6 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       onReset: _onReset,
       onCountdownChanged: _onCountdownChanged,
     );
-
-    // TODO: Remove this after testing - This is only for development purposes
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final size = MediaQuery.of(context).size;
-      _gameManager.addTestFingers(size);
-      for (var i = 1; i <= 4; i++) {
-        _animationManager.addFingerAnimation(i);
-      }
-    });
   }
 
   @override
@@ -277,38 +269,35 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
           ],
 
           // Gesture Detector and UI
-          GestureDetector(
+          Listener(
             behavior: HitTestBehavior.translucent,
-            onPanDown: _isInteractionEnabled ? (details) {
-              if (_gameManager.isSelecting || _gameManager.selectedFinger != null) return;
+            onPointerDown: _isInteractionEnabled ? (event) {
+              if (_gameManager.isSelecting || 
+                  _gameManager.selectedFinger != null ||
+                  _gameManager.fingers.length >= GameScreen.kMaxFingers) return;
               
-              final pointerCount = _gameManager.fingers.length + 1;
-              _gameManager.addFinger(pointerCount, details.localPosition);
-              _animationManager.addFingerAnimation(pointerCount);
+              final RenderBox renderBox = context.findRenderObject() as RenderBox;
+              final localPosition = renderBox.globalToLocal(event.position);
+              
+              _gameManager.addFinger(event.pointer, localPosition);
+              _animationManager.addFingerAnimation(event.pointer);
               setState(() {});
             } : null,
-            onPanUpdate: _isInteractionEnabled ? (details) {
+            onPointerMove: _isInteractionEnabled ? (event) {
               if (_gameManager.isSelecting || _gameManager.selectedFinger != null) return;
-              if (_gameManager.fingers.isNotEmpty) {
-                _gameManager.updateFingerPosition(_gameManager.fingers.keys.last, details.localPosition);
+              if (_gameManager.fingers.containsKey(event.pointer)) {
+                final RenderBox renderBox = context.findRenderObject() as RenderBox;
+                final localPosition = renderBox.globalToLocal(event.position);
+                
+                _gameManager.updateFingerPosition(event.pointer, localPosition);
                 setState(() {});
               }
             } : null,
-            onPanCancel: _isInteractionEnabled ? () {
+            onPointerUp: _isInteractionEnabled ? (event) {
               if (_gameManager.isSelecting || _gameManager.selectedFinger != null) return;
-              if (_gameManager.fingers.isNotEmpty) {
-                final lastKey = _gameManager.fingers.keys.last;
-                _gameManager.removeFinger(lastKey);
-                _animationManager.removeFingerAnimation(lastKey);
-                setState(() {});
-              }
-            } : null,
-            onPanEnd: _isInteractionEnabled ? (details) {
-              if (_gameManager.isSelecting || _gameManager.selectedFinger != null) return;
-              if (_gameManager.fingers.isNotEmpty) {
-                final lastKey = _gameManager.fingers.keys.last;
-                _gameManager.removeFinger(lastKey);
-                _animationManager.removeFingerAnimation(lastKey);
+              if (_gameManager.fingers.containsKey(event.pointer)) {
+                _gameManager.removeFinger(event.pointer);
+                _animationManager.removeFingerAnimation(event.pointer);
                 setState(() {});
               }
             } : null,
