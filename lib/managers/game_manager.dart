@@ -36,7 +36,7 @@ class GameManager {
     if (fingers.length >= GameScreen.kMaxFingers) return;
     
     fingers[fingerKey] = position;
-    fingerColors[fingerKey] = _getRandomColor();
+    fingerColors[fingerKey] = _getNextColor();
     _resetWaitTimer();
   }
 
@@ -163,9 +163,12 @@ class GameManager {
     onReset();
   }
 
-  Color _getRandomColor() {
-    final random = Random();
-    final hue = random.nextDouble() * 360;
-    return HSLColor.fromAHSL(1, hue, 0.8, 0.5).toColor();
+  Color _getNextColor() {
+    // Get the next available color from the static list
+    final usedColors = fingerColors.values.toSet();
+    return GameScreen.kGameColors.firstWhere(
+      (color) => !usedColors.contains(color),
+      orElse: () => GameScreen.kGameColors[0], // Fallback to first color if all are used
+    );
   }
 } 

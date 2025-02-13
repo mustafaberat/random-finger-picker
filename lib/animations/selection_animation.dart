@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../screens/game_screen.dart';
 
 class SelectionAnimation {
-  static const Duration duration = Duration(milliseconds: 200);
+  static const Duration duration = Duration(milliseconds: 150); // Faster base duration
 
   static Widget build({
     required Color color,
@@ -14,35 +14,40 @@ class SelectionAnimation {
     final baseOpacity = GameScreen.kDarkenedOpacity;
     
     if (isSelected) {
-      // Calculate glow intensity based on selection progress
-      final glowIntensity = (1 + sin(selectionProgress * 2 * pi)) * 0.5;
-      final highlightIntensity = 1.0 + (glowIntensity * 0.5);
+      // Enhanced glow intensity calculation for more dramatic effect
+      final glowIntensity = (1.2 + sin(selectionProgress * 3 * pi)) * 0.7;
+      final highlightIntensity = 1.2 + (glowIntensity * 0.6);
       
-      // Pulse effect for selected circle
-      final pulseScale = 1.0 + (glowIntensity * 0.2);
+      // More pronounced pulse effect
+      final pulseScale = 1.0 + (sin(selectionProgress * 3 * pi) * 0.2);
       
-      return Transform.scale(
-        scale: scale * pulseScale,
+      return Container(
+        width: GameScreen.kFingerSize * scale * pulseScale,
+        height: GameScreen.kFingerSize * scale * pulseScale,
         child: Stack(
           alignment: Alignment.center,
           children: [
-            // Outer glow
+            // Enhanced outer glow
             Container(
-              width: GameScreen.kFingerSize * GameScreen.kOuterBorderScale * 1.2,
-              height: GameScreen.kFingerSize * GameScreen.kOuterBorderScale * 1.2,
+              width: GameScreen.kFingerSize * GameScreen.kOuterBorderScale * 1.15,
+              height: GameScreen.kFingerSize * GameScreen.kOuterBorderScale * 1.15,
               decoration: BoxDecoration(
-                color: color.withOpacity(GameScreen.kBorderOpacity * glowIntensity * 0.5),
+                color: color.withOpacity(GameScreen.kBorderOpacity * glowIntensity * 0.6),
                 shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.white.withOpacity(GameScreen.kBorderOpacity * 0.8),
+                  width: GameScreen.kOuterBorderWidth,
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: color.withOpacity(GameScreen.kGlowOpacity * glowIntensity),
-                    blurRadius: GameScreen.kGlowBlurRadius * 2,
-                    spreadRadius: GameScreen.kGlowSpreadRadius * glowIntensity,
+                    color: color.withOpacity(GameScreen.kGlowOpacity * glowIntensity * 1.2),
+                    blurRadius: GameScreen.kGlowBlurRadius * 2.5,
+                    spreadRadius: GameScreen.kGlowSpreadRadius * glowIntensity * 1.3,
                   ),
                 ],
               ),
             ),
-            // Main circle
+            // Enhanced main circle
             Container(
               width: GameScreen.kFingerSize,
               height: GameScreen.kFingerSize,
@@ -50,14 +55,14 @@ class SelectionAnimation {
                 color: color,
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: Colors.white.withOpacity(GameScreen.kHighlightBorderOpacity * highlightIntensity),
-                  width: GameScreen.kBorderWidth * highlightIntensity,
+                  color: Colors.white.withOpacity(GameScreen.kHighlightBorderOpacity),
+                  width: GameScreen.kBorderWidth * 1.2,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: color.withOpacity(GameScreen.kGlowOpacity * highlightIntensity),
-                    blurRadius: GameScreen.kGlowBlurRadius,
-                    spreadRadius: GameScreen.kGlowSpreadRadius,
+                    color: color.withOpacity(GameScreen.kGlowOpacity * highlightIntensity * 1.3),
+                    blurRadius: GameScreen.kGlowBlurRadius * 1.5,
+                    spreadRadius: GameScreen.kGlowSpreadRadius * 1.2,
                   ),
                 ],
               ),
@@ -66,9 +71,10 @@ class SelectionAnimation {
         ),
       );
     } else {
-      // Non-selected circles stay darkened but maintain a subtle pulse
-      return Transform.scale(
-        scale: scale,
+      // Improved non-selected circles with maintained visibility
+      return Container(
+        width: GameScreen.kFingerSize * scale,
+        height: GameScreen.kFingerSize * scale,
         child: Stack(
           alignment: Alignment.center,
           children: [
@@ -76,8 +82,12 @@ class SelectionAnimation {
               width: GameScreen.kFingerSize * GameScreen.kOuterBorderScale,
               height: GameScreen.kFingerSize * GameScreen.kOuterBorderScale,
               decoration: BoxDecoration(
-                color: color.withOpacity(GameScreen.kBorderOpacity * 0.25),
+                color: color.withOpacity(GameScreen.kBorderOpacity * 0.3),
                 shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.white.withOpacity(GameScreen.kBorderOpacity * 0.6),
+                  width: GameScreen.kOuterBorderWidth * 0.8,
+                ),
               ),
             ),
             Container(
@@ -87,9 +97,16 @@ class SelectionAnimation {
                 color: color.withOpacity(baseOpacity),
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: Colors.white.withOpacity(GameScreen.kBorderOpacity * 0.5),
+                  color: Colors.white.withOpacity(GameScreen.kBorderOpacity * 0.7),
                   width: GameScreen.kBorderWidth,
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: color.withOpacity(GameScreen.kGlowOpacity * 0.3),
+                    blurRadius: GameScreen.kGlowBlurRadius * 0.5,
+                    spreadRadius: GameScreen.kGlowSpreadRadius * 0.5,
+                  ),
+                ],
               ),
             ),
           ],

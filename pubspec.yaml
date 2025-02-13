@@ -30,11 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.2
-  confetti: ^0.7.0  # Konfeti animasyonu için
+  confetti: ^0.7.0
 
 dev_dependencies:
   flutter_test:
@@ -100,9 +96,12 @@ flutter:
   # see https://flutter.dev/to/font-from-package
 
 flutter_launcher_icons:
-  android: "launcher_icon"
+  android: true
   image_path: "assets/icon.png"
   min_sdk_android: 21
+  adaptive_icon_background: "#202121"
+  adaptive_icon_foreground: "assets/icon.png"
+  remove_alpha_ios: true
   web:
     generate: true
     image_path: "assets/icon.png"

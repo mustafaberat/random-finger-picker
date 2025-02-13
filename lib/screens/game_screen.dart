@@ -15,6 +15,20 @@ class GameScreen extends StatefulWidget {
   static const Color kBackgroundColor = Color(0xFF202121);
   static const int kMaxFingers = 10; // Maximum number of fingers allowed
   
+  // Game colors
+  static const List<Color> kGameColors = [
+    Colors.red,
+    Colors.blue,
+    Colors.yellow,
+    Colors.orange,
+    Colors.purple,
+    Colors.green,
+    Colors.cyan,
+    Colors.teal,
+    Colors.pink,
+    Colors.amber,
+  ];
+  
   // Game timing
   static const int kInitialCountdown = 5;
   static const Duration kWinnerShowDuration = Duration(milliseconds: 3000);
@@ -240,16 +254,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                   gravity: 0.3,
                   shouldLoop: false,
                   particleDrag: 0.05,
-                  colors: const [ Colors.red,
-  Colors.green,
-  Colors.blue,
-  Colors.yellow,
-  Colors.orange,
-  Colors.purple,
-  Colors.pink,
-  Colors.cyan,
-  Colors.teal,
-  Colors.brown],
+                  colors: GameScreen.kGameColors,
                 ),
               ),
               Align(
@@ -264,7 +269,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                   gravity: 0.3,
                   shouldLoop: false,
                   particleDrag: 0.05,
-                  colors: const [Colors.green, Colors.blue, Colors.pink, Colors.orange, Colors.purple, Colors.red],
+                  colors: GameScreen.kGameColors,
                 ),
               ),
               Align(
@@ -279,7 +284,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                   gravity: 0.3,
                   shouldLoop: false,
                   particleDrag: 0.05,
-                  colors: const [Colors.green, Colors.blue, Colors.pink, Colors.orange, Colors.purple, Colors.red],
+                  colors: GameScreen.kGameColors,
                 ),
               ),
             ],

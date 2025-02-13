@@ -1,27 +1,28 @@
-# Flutter wrapper
+# Flutter specific rules
+-keepclassmembers class * implements android.os.Parcelable {
+    static ** CREATOR;
+}
+
+# Keep Flutter app
 -keep class io.flutter.app.** { *; }
--keep class io.flutter.plugin.** { *; }
--keep class io.flutter.util.** { *; }
--keep class io.flutter.view.** { *; }
--keep class io.flutter.** { *; }
--keep class io.flutter.plugins.** { *; }
--keep class io.flutter.plugin.editing.** { *; }
+-keep class io.flutter.plugin.**  { *; }
+-keep class io.flutter.util.**  { *; }
+-keep class io.flutter.view.**  { *; }
+-keep class io.flutter.**  { *; }
+-keep class io.flutter.plugins.**  { *; }
 
-# Keep your application classes
--keep class com.example.random_finger_picker.** { *; }
+# Keep your application classes that have native methods
+-keepclasseswithmembers class com.example.random_finger_picker.** {
+    native <methods>;
+}
 
-# Play Core library
--keep class com.google.android.play.core.** { *; }
--keep class com.google.android.play.core.splitcompat.** { *; }
--keep class com.google.android.play.core.splitinstall.** { *; }
--keep class com.google.android.play.core.tasks.** { *; }
-
-# Optimize
--optimizations !code/simplification/arithmetic,!code/simplification/cast,!field/*,!class/merging/*
+# Aggressive optimization
+-optimizations !code/allocation/variable
 -optimizationpasses 5
 -allowaccessmodification
+-dontpreverify
 
-# Remove logging
+# Remove all debug logs
 -assumenosideeffects class android.util.Log {
     public static *** d(...);
     public static *** v(...);
@@ -29,3 +30,45 @@
     public static *** w(...);
     public static *** e(...);
 }
+
+# Remove unused code
+-dontwarn android.test.**
+-dontwarn org.junit.**
+-dontwarn android.support.test.**
+-dontwarn org.jetbrains.annotations.**
+-dontwarn kotlin.**
+
+# Keep necessary classes for animations and UI
+-keep class com.example.random_finger_picker.animations.** { *; }
+-keep class com.example.random_finger_picker.screens.** { *; }
+
+# Confetti package rules
+-keep class com.example.random_finger_picker.confetti.** { *; }
+
+# Additional optimizations
+-repackageclasses ''
+-keepattributes Signature
+-keepattributes *Annotation*
+-keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile
+
+# Remove kotlin metadata
+-dontwarn kotlin.**
+-dontwarn org.jetbrains.annotations.**
+-keep class kotlin.Metadata { *; }
+
+# Remove android logging
+-assumenosideeffects class android.util.Log {
+    public static boolean isLoggable(java.lang.String, int);
+    public static int v(...);
+    public static int i(...);
+    public static int w(...);
+    public static int d(...);
+    public static int e(...);
+}
+
+# Play Core library
+-keep class com.google.android.play.core.** { *; }
+-keep class com.google.android.play.core.splitcompat.** { *; }
+-keep class com.google.android.play.core.splitinstall.** { *; }
+-keep class com.google.android.play.core.tasks.** { *; }
