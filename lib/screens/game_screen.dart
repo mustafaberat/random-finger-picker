@@ -132,6 +132,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     final winAnimation = _animationManager.getWinAnimation();
 
     return Scaffold(
+      backgroundColor: GameScreen.kBackgroundColor,
       body: Stack(
         children: [
           // Background
@@ -139,81 +140,93 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
             animation: _animationManager.winAnimationController,
             builder: (context, child) {
               final backgroundColor = _gameManager.isWinAnimationPlaying && selectedColor != null
-                  ? Color.lerp(const Color(0xFF202121), selectedColor, _animationManager.winAnimationController.value)
-                  : const Color(0xFF202121);
+                  ? Color.lerp(GameScreen.kBackgroundColor, selectedColor, _animationManager.winAnimationController.value)
+                  : GameScreen.kBackgroundColor;
               
               return Container(
-                color: backgroundColor,
-                child: Stack(
-                  children: [
-                    // Fingers
-                    ..._gameManager.fingers.entries.map((entry) {
-                      final fingerIndex = _gameManager.fingers.keys.toList().indexOf(entry.key);
-                      final isSelected = _gameManager.isSelecting && 
-                          _gameManager.currentFingerIndex == fingerIndex;
-                      final animation = _animationManager.fingerAnimationControllers[entry.key];
-                      final isWinner = _gameManager.selectedFinger == entry.key;
+                width: double.infinity,
+                height: double.infinity,
+                color: backgroundColor ?? GameScreen.kBackgroundColor,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Container(
+                    height: MediaQuery.of(context).size.height,
+                    color: Colors.transparent,
+                    child: Stack(
+                      children: [
+                        // Fingers
+                        ..._gameManager.fingers.entries.map((entry) {
+                          final fingerIndex = _gameManager.fingers.keys.toList().indexOf(entry.key);
+                          final isSelected = _gameManager.isSelecting && 
+                              _gameManager.currentFingerIndex == fingerIndex;
+                          final animation = _animationManager.fingerAnimationControllers[entry.key];
+                          final isWinner = _gameManager.selectedFinger == entry.key;
+                          final fingerColor = _gameManager.fingerColors[entry.key];
 
-                      double finalScale = 1.0;
-                      double opacity = 1.0;
+                          if (fingerColor == null) return const SizedBox.shrink();
 
-                      if (_gameManager.isWinAnimationPlaying) {
-                        if (isWinner) {
-                          opacity = 1.0;
-                        } else {
-                          opacity = 0.0;
-                          finalScale = 0.0;
-                        }
-                      }
+                          double finalScale = 1.0;
+                          double opacity = 1.0;
 
-                      return Positioned(
-                        left: entry.value.dx - GameScreen.kFingerSize / 2,
-                        top: entry.value.dy - GameScreen.kFingerSize / 2,
-                        child: AnimatedBuilder(
-                          animation: Listenable.merge([
-                            animation ?? const AlwaysStoppedAnimation(1.0),
-                            if (_gameManager.isSelecting) _animationManager.selectionController,
-                            if (_gameManager.isWinAnimationPlaying) winAnimation,
-                          ]),
-                          builder: (context, child) {
-                            final baseScale = (animation?.value ?? 1.0) * finalScale;
-                            final tapProgress = animation?.value ?? 1.0;
+                          if (_gameManager.isWinAnimationPlaying) {
+                            if (isWinner) {
+                              opacity = 1.0;
+                            } else {
+                              opacity = 0.0;
+                              finalScale = 0.0;
+                            }
+                          }
 
-                            if (_gameManager.isWinAnimationPlaying) {
-                              if (isWinner) {
-                                return WinnerAnimation.build(
-                                  color: _gameManager.fingerColors[entry.key]!,
-                                  progress: winAnimation.value,
-                                  baseScale: baseScale,
+                          return Positioned(
+                            left: entry.value.dx - GameScreen.kFingerSize / 2,
+                            top: entry.value.dy - GameScreen.kFingerSize / 2,
+                            child: AnimatedBuilder(
+                              animation: Listenable.merge([
+                                animation ?? const AlwaysStoppedAnimation(1.0),
+                                if (_gameManager.isSelecting) _animationManager.selectionController,
+                                if (_gameManager.isWinAnimationPlaying) winAnimation,
+                              ]),
+                              builder: (context, child) {
+                                final baseScale = (animation?.value ?? 1.0) * finalScale;
+                                final tapProgress = animation?.value ?? 1.0;
+
+                                if (_gameManager.isWinAnimationPlaying) {
+                                  if (isWinner) {
+                                    return WinnerAnimation.build(
+                                      color: fingerColor,
+                                      progress: winAnimation.value,
+                                      baseScale: baseScale,
+                                    );
+                                  }
+                                  return const SizedBox.shrink();
+                                }
+
+                                if (_gameManager.isSelecting) {
+                                  return SelectionAnimation.build(
+                                    color: fingerColor,
+                                    scale: baseScale,
+                                    isSelected: isSelected,
+                                    selectionProgress: _animationManager.selectionController.value,
+                                  );
+                                }
+
+                                return Opacity(
+                                  opacity: opacity,
+                                  child: FingerTapAnimation.build(
+                                    color: fingerColor,
+                                    scale: baseScale,
+                                    tapProgress: tapProgress,
+                                    isSelecting: _gameManager.isSelecting,
+                                    isWinAnimationPlaying: _gameManager.isWinAnimationPlaying,
+                                  ),
                                 );
-                              }
-                              return const SizedBox.shrink();
-                            }
-
-                            if (_gameManager.isSelecting) {
-                              return SelectionAnimation.build(
-                                color: _gameManager.fingerColors[entry.key]!,
-                                scale: baseScale,
-                                isSelected: isSelected,
-                                selectionProgress: _animationManager.selectionController.value,
-                              );
-                            }
-
-                            return Opacity(
-                              opacity: opacity,
-                              child: FingerTapAnimation.build(
-                                color: _gameManager.fingerColors[entry.key]!,
-                                scale: baseScale,
-                                tapProgress: tapProgress,
-                                isSelecting: _gameManager.isSelecting,
-                                isWinAnimationPlaying: _gameManager.isWinAnimationPlaying,
-                              ),
-                            );
-                          },
-                        ),
-                      );
-                    }).toList(),
-                  ],
+                              },
+                            ),
+                          );
+                        }).toList(),
+                      ],
+                    ),
+                  ),
                 ),
               );
             },
@@ -274,7 +287,9 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
             onPointerDown: _isInteractionEnabled ? (event) {
               if (_gameManager.isSelecting || 
                   _gameManager.selectedFinger != null ||
-                  _gameManager.fingers.length >= GameScreen.kMaxFingers) return;
+                  _gameManager.fingers.length >= GameScreen.kMaxFingers) {
+                return;
+              }
               
               final RenderBox renderBox = context.findRenderObject() as RenderBox;
               final localPosition = renderBox.globalToLocal(event.position);
@@ -284,14 +299,15 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
               setState(() {});
             } : null,
             onPointerMove: _isInteractionEnabled ? (event) {
-              if (_gameManager.isSelecting || _gameManager.selectedFinger != null) return;
-              if (_gameManager.fingers.containsKey(event.pointer)) {
-                final RenderBox renderBox = context.findRenderObject() as RenderBox;
-                final localPosition = renderBox.globalToLocal(event.position);
-                
-                _gameManager.updateFingerPosition(event.pointer, localPosition);
-                setState(() {});
-              }
+              if (_gameManager.isSelecting || 
+                  _gameManager.selectedFinger != null ||
+                  !_gameManager.fingers.containsKey(event.pointer)) return;
+              
+              final RenderBox renderBox = context.findRenderObject() as RenderBox;
+              final localPosition = renderBox.globalToLocal(event.position);
+              
+              _gameManager.updateFingerPosition(event.pointer, localPosition);
+              setState(() {});
             } : null,
             onPointerUp: _isInteractionEnabled ? (event) {
               if (_gameManager.isSelecting || _gameManager.selectedFinger != null) return;
