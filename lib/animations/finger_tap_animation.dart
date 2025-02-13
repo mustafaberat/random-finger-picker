@@ -28,12 +28,12 @@ class FingerTapAnimation {
     } else {
       // Second phase: Shrink (70-100% of animation)
       final shrinkProgress = ((clampedProgress - 0.7) / 0.3).clamp(0.0, 1.0);
-      currentScale = maxScale - ((maxScale - finalRestScale) * Curves.easeOut.transform(shrinkProgress));
+      currentScale = maxScale - ((maxScale - finalRestScale) * Curves.easeInOut.transform(shrinkProgress));
     }
 
-    // Border opacity with smooth fade in
+    // Border opacity with smooth fade in/out
     final borderProgress = clampedProgress.clamp(0.0, 1.0);
-    final borderOpacity = (Curves.easeOut.transform(borderProgress) * GameScreen.kBorderOpacity)
+    final borderOpacity = (Curves.easeInOut.transform(borderProgress) * GameScreen.kBorderOpacity)
         .clamp(0.0, GameScreen.kBorderOpacity);
 
     return Transform.scale(
@@ -41,16 +41,16 @@ class FingerTapAnimation {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Outer border circle
+          // Outer border circle with smoother transition
           Container(
             width: GameScreen.kFingerSize * GameScreen.kOuterBorderScale,
             height: GameScreen.kFingerSize * GameScreen.kOuterBorderScale,
             decoration: BoxDecoration(
-              color: color.withOpacity(borderOpacity * 0.5),
+              color: color.withOpacity(borderOpacity * 0.3),
               shape: BoxShape.circle,
             ),
           ),
-          // Main circle
+          // Main circle with improved shadow
           Container(
             width: GameScreen.kFingerSize,
             height: GameScreen.kFingerSize,
@@ -63,9 +63,9 @@ class FingerTapAnimation {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: color.withOpacity(GameScreen.kGlowOpacity),
+                  color: color.withOpacity(GameScreen.kGlowOpacity * 0.7),
                   blurRadius: GameScreen.kGlowBlurRadius,
-                  spreadRadius: GameScreen.kGlowSpreadRadius,
+                  spreadRadius: GameScreen.kGlowSpreadRadius * 0.7,
                 ),
               ],
             ),

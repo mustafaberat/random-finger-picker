@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../screens/game_screen.dart';
 
 class SelectionAnimation {
-  static const Duration duration = GameScreen.kSelectionDuration;
+  static const Duration duration = Duration(milliseconds: 200);
 
   static Widget build({
     required Color color,
@@ -14,49 +14,32 @@ class SelectionAnimation {
     final baseOpacity = GameScreen.kDarkenedOpacity;
     
     if (isSelected) {
-      // Fast selection phase (0-0.6), slow highlight phase (0.6-0.8), final display (0.8-1.0)
-      final isInFastPhase = selectionProgress < 0.6;
-      final isInSlowPhase = selectionProgress >= 0.6 && selectionProgress < 0.8;
-      final isInFinalPhase = selectionProgress >= 0.8;
+      // Calculate glow intensity based on selection progress
+      final glowIntensity = (1 + sin(selectionProgress * 2 * pi)) * 0.5;
+      final highlightIntensity = 1.0 + (glowIntensity * 0.5);
       
-      // Calculate progress for each phase
-      double cycleProgress;
-      double highlightIntensity;
-      
-      if (isInFastPhase) {
-        // Fast cycling phase
-        cycleProgress = (selectionProgress / 0.6 * 8.0) % 1.0; // 8 fast cycles
-        highlightIntensity = 1.0;
-      } else if (isInSlowPhase) {
-        // Slow cycling phase with increasing highlight
-        cycleProgress = ((selectionProgress - 0.6) / 0.2 * 2.0) % 1.0; // 2 slow cycles
-        highlightIntensity = ((selectionProgress - 0.6) / 0.2) * 2.0;
-      } else {
-        // Final display phase
-        cycleProgress = 0.0; // Stop at current position
-        highlightIntensity = 2.0 + ((selectionProgress - 0.8) / 0.2) * 1.0; // Extra glow at the end
-      }
-      
-      // Smooth out the cycle progress
-      final smoothProgress = Curves.easeInOut.transform(cycleProgress);
-      
-      // Calculate pulsing effect
-      final pulseEffect = isInFinalPhase 
-          ? sin(selectionProgress * 10 * pi) * 0.2 + 0.8 // Gentle pulse in final phase
-          : smoothProgress;
+      // Pulse effect for selected circle
+      final pulseScale = 1.0 + (glowIntensity * 0.2);
       
       return Transform.scale(
-        scale: scale * (1.0 + (GameScreen.kPulseScaleFactor * pulseEffect)),
+        scale: scale * pulseScale,
         child: Stack(
           alignment: Alignment.center,
           children: [
-            // Outer border circle
+            // Outer glow
             Container(
-              width: GameScreen.kFingerSize * GameScreen.kOuterBorderScale,
-              height: GameScreen.kFingerSize * GameScreen.kOuterBorderScale,
+              width: GameScreen.kFingerSize * GameScreen.kOuterBorderScale * 1.2,
+              height: GameScreen.kFingerSize * GameScreen.kOuterBorderScale * 1.2,
               decoration: BoxDecoration(
-                color: color.withOpacity(GameScreen.kBorderOpacity * highlightIntensity),
+                color: color.withOpacity(GameScreen.kBorderOpacity * glowIntensity * 0.5),
                 shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: color.withOpacity(GameScreen.kGlowOpacity * glowIntensity),
+                    blurRadius: GameScreen.kGlowBlurRadius * 2,
+                    spreadRadius: GameScreen.kGlowSpreadRadius * glowIntensity,
+                  ),
+                ],
               ),
             ),
             // Main circle
@@ -68,13 +51,13 @@ class SelectionAnimation {
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: Colors.white.withOpacity(GameScreen.kHighlightBorderOpacity * highlightIntensity),
-                  width: GameScreen.kBorderWidth * (isInFinalPhase ? 1.5 : 1.0),
+                  width: GameScreen.kBorderWidth * highlightIntensity,
                 ),
                 boxShadow: [
                   BoxShadow(
                     color: color.withOpacity(GameScreen.kGlowOpacity * highlightIntensity),
-                    blurRadius: GameScreen.kGlowBlurRadius * (isInFinalPhase ? 1.5 : 1.0),
-                    spreadRadius: GameScreen.kGlowSpreadRadius * (isInFinalPhase ? 1.5 : 1.0),
+                    blurRadius: GameScreen.kGlowBlurRadius,
+                    spreadRadius: GameScreen.kGlowSpreadRadius,
                   ),
                 ],
               ),
@@ -83,13 +66,12 @@ class SelectionAnimation {
         ),
       );
     } else {
-      // Non-selected circles stay darkened but maintain border
+      // Non-selected circles stay darkened but maintain a subtle pulse
       return Transform.scale(
         scale: scale,
         child: Stack(
           alignment: Alignment.center,
           children: [
-            // Outer border circle
             Container(
               width: GameScreen.kFingerSize * GameScreen.kOuterBorderScale,
               height: GameScreen.kFingerSize * GameScreen.kOuterBorderScale,
@@ -98,7 +80,6 @@ class SelectionAnimation {
                 shape: BoxShape.circle,
               ),
             ),
-            // Main circle
             Container(
               width: GameScreen.kFingerSize,
               height: GameScreen.kFingerSize,
