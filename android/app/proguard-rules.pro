@@ -12,7 +12,7 @@
 -keep class io.flutter.plugins.**  { *; }
 
 # Keep your application classes that have native methods
--keepclasseswithmembers class com.example.random_finger_picker.** {
+-keepclasseswithmembers class com.arusoft.randomfingerpicker.** {
     native <methods>;
 }
 
@@ -39,11 +39,11 @@
 -dontwarn kotlin.**
 
 # Keep necessary classes for animations and UI
--keep class com.example.random_finger_picker.animations.** { *; }
--keep class com.example.random_finger_picker.screens.** { *; }
+-keep class com.arusoft.randomfingerpicker.animations.** { *; }
+-keep class com.arusoft.randomfingerpicker.screens.** { *; }
 
 # Confetti package rules
--keep class com.example.random_finger_picker.confetti.** { *; }
+-keep class com.arusoft.randomfingerpicker.confetti.** { *; }
 
 # Additional optimizations
 -repackageclasses ''

@@ -1,4 +1,4 @@
-package com.example.random_finger_picker
+package com.arusoft.randomfingerpicker
 
 import io.flutter.embedding.android.FlutterActivity
 
