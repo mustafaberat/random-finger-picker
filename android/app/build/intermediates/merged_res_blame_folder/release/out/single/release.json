@@ -1,0 +1,130 @@
+[
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/mipmap-anydpi-v26/ic_launcher.xml"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/mipmap-xxhdpi_launcher_icon.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/mipmap-xxhdpi/launcher_icon.png"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/mipmap-mdpi_app_icon_round.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/mipmap-mdpi/app_icon_round.png"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/mipmap-mdpi_launcher_icon_round.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/mipmap-mdpi/launcher_icon_round.png"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/mipmap-mdpi_ic_launcher.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/mipmap-mdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/drawable-v21_launch_background.xml.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/drawable-v21/launch_background.xml"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/mipmap-xhdpi_app_icon_round.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/mipmap-xhdpi/app_icon_round.png"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/mipmap-xxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/drawable-xxxhdpi_ic_launcher_foreground.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/drawable-xxxhdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/mipmap-xxxhdpi_launcher_icon.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/mipmap-xxxhdpi/launcher_icon.png"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/mipmap-xhdpi_launcher_icon_round.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/mipmap-xhdpi/launcher_icon_round.png"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/mipmap-xxxhdpi_launcher_icon_round.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/mipmap-xxxhdpi/launcher_icon_round.png"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/mipmap-hdpi_launcher_icon_round.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/mipmap-hdpi/launcher_icon_round.png"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/mipmap-hdpi_launcher_icon.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/mipmap-hdpi/launcher_icon.png"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/mipmap-xxhdpi_app_icon_round.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/mipmap-xxhdpi/app_icon_round.png"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/mipmap-xhdpi_app_icon.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/mipmap-xhdpi/app_icon.png"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/mipmap-xxhdpi_app_icon.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/mipmap-xxhdpi/app_icon.png"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/drawable-xxhdpi_ic_launcher_foreground.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/drawable-xxhdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/drawable-hdpi_ic_launcher_foreground.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/drawable-hdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/drawable-xhdpi_ic_launcher_foreground.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/drawable-xhdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/mipmap-hdpi_app_icon.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/mipmap-hdpi/app_icon.png"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/mipmap-xxxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/drawable-mdpi_ic_launcher_foreground.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/drawable-mdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/mipmap-xxxhdpi_app_icon.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/mipmap-xxxhdpi/app_icon.png"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/mipmap-xxhdpi_launcher_icon_round.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/mipmap-xxhdpi/launcher_icon_round.png"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/mipmap-mdpi_app_icon.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/mipmap-mdpi/app_icon.png"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/mipmap-mdpi_launcher_icon.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/mipmap-mdpi/launcher_icon.png"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/mipmap-xhdpi_launcher_icon.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/mipmap-xhdpi/launcher_icon.png"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/mipmap-hdpi_ic_launcher.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/mipmap-hdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/mipmap-hdpi_app_icon_round.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/mipmap-hdpi/app_icon_round.png"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/mipmap-xhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.arusoft.randomfingerpicker.app-merged_res-24:/mipmap-xxxhdpi_app_icon_round.png.flat",
+        "source": "com.arusoft.randomfingerpicker.app-main-25:/mipmap-xxxhdpi/app_icon_round.png"
+    }
+]

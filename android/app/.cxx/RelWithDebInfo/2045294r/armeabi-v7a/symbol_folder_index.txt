@@ -1,0 +1,1 @@
+/Users/mustafaberataru/Projects/personal/mobile-apps/random_finger_picker/android/app/build/intermediates/cxx/RelWithDebInfo/2045294r/obj/armeabi-v7a

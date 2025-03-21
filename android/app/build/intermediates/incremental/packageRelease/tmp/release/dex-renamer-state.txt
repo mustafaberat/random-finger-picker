@@ -1,0 +1,4 @@
+#Fri Mar 21 01:00:30 TRT 2025
+base.0=/Users/mustafaberataru/Projects/personal/mobile-apps/random_finger_picker/android/app/build/intermediates/dex/release/mergeDexRelease/classes.dex
+renamed.0=classes.dex
+path.0=classes.dex

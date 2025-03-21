@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "/Users/mustafaberataru/flutter/packages/flutter_tools/gradle/src/main/groovy/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/mustafaberataru/Android/Sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/mustafaberataru/Projects/personal/mobile-apps/random_finger_picker/android/app/.cxx/RelWithDebInfo/u0281v2x/x86_64",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/mustafaberataru/Android/Sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/mustafaberataru/Projects/personal/mobile-apps/random_finger_picker/android/app/.cxx/RelWithDebInfo/u0281v2x/x86_64",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}

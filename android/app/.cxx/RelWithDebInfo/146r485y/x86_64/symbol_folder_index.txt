@@ -1,0 +1,1 @@
+/Users/mustafaberataru/Projects/personal/mobile-apps/random_finger_picker/build/app/intermediates/cxx/RelWithDebInfo/146r485y/obj/x86_64

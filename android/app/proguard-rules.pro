@@ -1,15 +1,14 @@
-# Flutter specific rules
--keepclassmembers class * implements android.os.Parcelable {
-    static ** CREATOR;
-}
+# Flutter wrapper
+-keep class io.flutter.app.** { *; }
+-keep class io.flutter.plugin.** { *; }
+-keep class io.flutter.util.** { *; }
+-keep class io.flutter.view.** { *; }
+-keep class io.flutter.** { *; }
+-keep class io.flutter.plugins.** { *; }
+-keep class io.flutter.embedding.** { *; }
 
 # Keep Flutter app
--keep class io.flutter.app.** { *; }
--keep class io.flutter.plugin.**  { *; }
--keep class io.flutter.util.**  { *; }
--keep class io.flutter.view.**  { *; }
--keep class io.flutter.**  { *; }
--keep class io.flutter.plugins.**  { *; }
+-keep class io.flutter.embedding.** { *; }
 
 # Keep your application classes that have native methods
 -keepclasseswithmembers class com.arusoft.randomfingerpicker.** {
@@ -31,13 +30,6 @@
     public static *** e(...);
 }
 
-# Remove unused code
--dontwarn android.test.**
--dontwarn org.junit.**
--dontwarn android.support.test.**
--dontwarn org.jetbrains.annotations.**
--dontwarn kotlin.**
-
 # Keep necessary classes for animations and UI
 -keep class com.arusoft.randomfingerpicker.animations.** { *; }
 -keep class com.arusoft.randomfingerpicker.screens.** { *; }
@@ -52,23 +44,31 @@
 -keepattributes SourceFile,LineNumberTable
 -renamesourcefileattribute SourceFile
 
-# Remove kotlin metadata
--dontwarn kotlin.**
--dontwarn org.jetbrains.annotations.**
--keep class kotlin.Metadata { *; }
-
-# Remove android logging
--assumenosideeffects class android.util.Log {
-    public static boolean isLoggable(java.lang.String, int);
-    public static int v(...);
-    public static int i(...);
-    public static int w(...);
-    public static int d(...);
-    public static int e(...);
-}
-
-# Play Core library
+# Play Core
 -keep class com.google.android.play.core.** { *; }
 -keep class com.google.android.play.core.splitcompat.** { *; }
+-keep class com.google.android.play.core.splitinstall.** { *; }
+-keep class com.google.android.play.core.tasks.** { *; }
+-keep class com.google.android.play.core.appupdate.** { *; }
+-keep class com.google.android.play.core.ktx.** { *; }
+
+# Keep R8 rules
+-keepattributes *Annotation*
+-keepattributes SourceFile,LineNumberTable
+-keep public class * extends java.lang.Exception
+
+# Kotlin
+-keep class kotlin.** { *; }
+-keep class kotlin.Metadata { *; }
+-dontwarn kotlin.**
+-keepclassmembers class **$WhenMappings {
+    <fields>;
+}
+-keepclassmembers class kotlin.Metadata {
+    public <methods>;
+}
+
+-keep class com.google.android.play.** { *; }
+-keep class com.google.android.play.core.** { *; }
 -keep class com.google.android.play.core.splitinstall.** { *; }
 -keep class com.google.android.play.core.tasks.** { *; }
