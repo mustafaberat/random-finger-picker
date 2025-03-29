@@ -14,6 +14,7 @@ class GameScreen extends StatefulWidget {
   static const double kFingerSize = 100.0;
   static const Color kBackgroundColor = Color(0xFF202121);
   static const int kMaxFingers = 10; // Maximum number of fingers allowed
+  static const String kFontFamily = 'LuckiestGuy'; // Global font family
   
   // Game colors
   static const List<Color> kGameColors = [
@@ -231,6 +232,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                                       color: fingerColor,
                                       progress: winAnimation.value,
                                       baseScale: baseScale,
+                                      fingerNumber: entry.key,
                                     ),
                                   );
                                 }
@@ -245,6 +247,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                                   selectionProgress: _animationManager.selectionController.value,
                                   fingerIndex: fingerIndex,
                                   totalFingers: _gameManager.fingers.length,
+                                  fingerNumber: entry.key,
                                 );
                               }
 
@@ -256,6 +259,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                                   tapProgress: tapProgress,
                                   isSelecting: _gameManager.isSelecting,
                                   isWinAnimationPlaying: _gameManager.isWinAnimationPlaying,
+                                  fingerNumber: entry.key,
                                 ),
                               );
                             },
@@ -384,7 +388,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                                   LocalizationService.instance.getString('put_fingers_on', context),
                                   style: const TextStyle(
                                     color: Colors.white,
-                                    fontFamily: 'LuckiestGuy',
+                                    fontFamily: GameScreen.kFontFamily,
                                     height: 1,
                                   ),
                                 ),
@@ -400,7 +404,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 72,
-                            fontFamily: 'LuckiestGuy',
+                            fontFamily: GameScreen.kFontFamily,
                           ),
                         ),
                       ),

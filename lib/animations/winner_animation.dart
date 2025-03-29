@@ -4,11 +4,13 @@ import '../screens/game_screen.dart';
 
 class WinnerAnimation {
   static const Duration duration = GameScreen.kWinDuration;
+  static const int lucyFingerId = 1; // Lucy's finger ID for consistency
 
   static Widget build({
     required Color color,
     required double progress,
     required double baseScale,
+    required int fingerNumber,
   }) {
     // Enhanced animation phases with slower timing
     final initialPause = 0.6; // Initial pause for selection animation
@@ -39,6 +41,7 @@ class WinnerAnimation {
 
     return Transform.scale(
       scale: currentScale + pulseEffect,
+      alignment: Alignment.center,
       child: Container(
         width: GameScreen.kFingerSize,
         height: GameScreen.kFingerSize,
@@ -99,6 +102,29 @@ class WinnerAnimation {
                     spreadRadius: 8 * glowIntensity,
                   ),
                 ],
+              ),
+              child: Center(
+                child: Transform.scale(
+                  scale: 1.0 + (scaleProgress * 0.5), // Numarayı da büyüt ama daha kontrollü
+                  child: Text(
+                    fingerNumber.toString(),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: GameScreen.kFingerSize * 0.4,
+                      fontFamily: GameScreen.kFontFamily,
+                      fontWeight: FontWeight.bold,
+                      height: 1,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black26,
+                          blurRadius: 2,
+                          offset: Offset(1, 1),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
           ],

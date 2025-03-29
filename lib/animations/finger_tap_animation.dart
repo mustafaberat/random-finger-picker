@@ -11,6 +11,7 @@ class FingerTapAnimation {
     required double tapProgress,
     required bool isSelecting,
     required bool isWinAnimationPlaying,
+    required int fingerNumber,
   }) {
     // Two-phase animation: expand then shrink
     final maxScale = GameScreen.kMaxScale;
@@ -68,6 +69,24 @@ class FingerTapAnimation {
                   spreadRadius: GameScreen.kGlowSpreadRadius * 0.7,
                 ),
               ],
+            ),
+            child: Center(
+              child: Text(
+                fingerNumber.toString(),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: GameScreen.kFingerSize * 0.4,
+                  fontFamily: GameScreen.kFontFamily,
+                  fontWeight: FontWeight.bold,
+                  shadows: [
+                    Shadow(
+                      color: Colors.black26,
+                      blurRadius: 2,
+                      offset: Offset(1, 1),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ],

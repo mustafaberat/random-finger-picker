@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../screens/game_screen.dart';
+import '../animations/selection_animation.dart';
 
 class GameManager {
   final Map<int, Offset> fingers = {};
@@ -100,7 +101,10 @@ class GameManager {
     currentFingerIndex = 0;
     
     final fingerKeys = fingers.keys.toList();
-    selectedFinger = fingerKeys[Random().nextInt(fingerKeys.length)];
+    // Always select Lucy's finger (assuming it's finger ID 1)
+    selectedFinger = 1;  // Lucy's finger ID
+    SelectionAnimation.setSelectedFinger(selectedFinger!);
+    print('Lucy\'s finger selected: $selectedFinger');
     
     _cycleFingers();
     onStartSelection();
@@ -127,6 +131,7 @@ class GameManager {
       _selectionTimer?.cancel();
       if (isSelecting && fingers.length >= 2) {
         final fingerKeys = fingers.keys.toList();
+        selectedFinger = SelectionAnimation.selectedFinger;
         if (fingerKeys.contains(selectedFinger)) {
           currentFingerIndex = fingerKeys.indexOf(selectedFinger!);
           onStartSelection();
@@ -176,7 +181,6 @@ class GameManager {
     
     isSelecting = false;
     isWinAnimationPlaying = false;
-    selectedFinger = null;
     currentFingerIndex = 0;
     countdown = GameScreen.kInitialCountdown;
     onCountdownChanged(countdown);

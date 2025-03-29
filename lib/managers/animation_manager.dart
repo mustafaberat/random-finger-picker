@@ -3,6 +3,7 @@ import '../animations/finger_tap_animation.dart';
 import '../animations/winner_animation.dart';
 import '../animations/selection_animation.dart';
 import '../screens/game_screen.dart';
+import 'dart:math';
 
 class AnimationManager {
   final Map<int, AnimationController> fingerAnimationControllers = {};
@@ -24,7 +25,7 @@ class AnimationManager {
   void _initializeControllers() {
     selectionController = AnimationController(
       vsync: vsync,
-      duration: SelectionAnimation.duration,
+      duration: Duration(milliseconds: 200),
     );
 
     winAnimationController = AnimationController(
@@ -34,12 +35,17 @@ class AnimationManager {
 
     speedController = AnimationController(
       vsync: vsync,
-      duration: const Duration(milliseconds: 2000),
+      duration: Duration(milliseconds: 200),
     );
 
     selectionController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        onSelectionComplete();
+        if (selectionController.value >= 1.0) {
+          onSelectionComplete();
+          startWinAnimation();
+        } else {
+          _animateNextSelection();
+        }
       }
     });
 
