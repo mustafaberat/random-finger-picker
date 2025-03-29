@@ -38,7 +38,7 @@ class GameScreen extends StatefulWidget {
   static const Duration kSelectionInterval = Duration(milliseconds: 200);
   static const Duration kSelectionDuration = Duration(milliseconds: 2000);
   static const Duration kTapDuration = Duration(milliseconds: 300);
-  static const Duration kWinDuration = Duration(milliseconds: 2000);
+  static const Duration kWinDuration = Duration(milliseconds: 4000);
   static const Duration kPulseDuration = Duration(milliseconds: 1000);
   static const Duration kConfettiDuration = Duration(seconds: 5);
   
@@ -59,6 +59,7 @@ class GameScreen extends StatefulWidget {
   static const double kGlowBlurRadius = 10.0;
   static const double kGlowSpreadRadius = 5.0;
   static const double kGlowOpacity = 0.3;
+  static const bool kDebugMode = true; // Debug mode flag
 
   const GameScreen({super.key});
 
@@ -99,6 +100,28 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       onReset: _onReset,
       onCountdownChanged: _onCountdownChanged,
     );
+
+    // Add debug fingers if in debug mode
+    if (GameScreen.kDebugMode) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final size = MediaQuery.of(context).size;
+        final centerX = size.width / 2;
+        final centerY = size.height / 2;
+        final spacing = 300.0;
+
+        // Add 4 fingers in a cross pattern
+        _gameManager.addFinger(1, Offset(centerX, centerY - spacing));
+        _gameManager.addFinger(2, Offset(centerX + spacing, centerY));
+        _gameManager.addFinger(3, Offset(centerX, centerY + spacing));
+        _gameManager.addFinger(4, Offset(centerX - spacing, centerY));
+
+        // Add animations for debug fingers
+        _animationManager.addFingerAnimation(1);
+        _animationManager.addFingerAnimation(2);
+        _animationManager.addFingerAnimation(3);
+        _animationManager.addFingerAnimation(4);
+      });
+    }
   }
 
   @override
@@ -127,7 +150,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   }
 
   void _onReset() {
-      setState(() {
+    setState(() {
       _isInteractionEnabled = true;
     });
     _animationManager.reset();
@@ -188,8 +211,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                         }
 
                         return Positioned(
-                          left: entry.value.dx - (GameScreen.kFingerSize / 2) - 12,
-                          top: entry.value.dy - (GameScreen.kFingerSize / 2) - 12,
+                          left: entry.value.dx - (GameScreen.kFingerSize / 2),
+                          top: entry.value.dy - (GameScreen.kFingerSize / 2),
                           child: AnimatedBuilder(
                             animation: Listenable.merge([
                               animation ?? const AlwaysStoppedAnimation(1.0),
@@ -202,10 +225,13 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
                               if (_gameManager.isWinAnimationPlaying) {
                                 if (isWinner) {
-                                  return WinnerAnimation.build(
-                                    color: fingerColor,
-                                    progress: winAnimation.value,
-                                    baseScale: baseScale,
+                                  return Transform.scale(
+                                    scale: 1.0,
+                                    child: WinnerAnimation.build(
+                                      color: fingerColor,
+                                      progress: winAnimation.value,
+                                      baseScale: baseScale,
+                                    ),
                                   );
                                 }
                                 return const SizedBox.shrink();
@@ -217,6 +243,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                                   scale: baseScale,
                                   isSelected: isSelected,
                                   selectionProgress: _animationManager.selectionController.value,
+                                  fingerIndex: fingerIndex,
+                                  totalFingers: _gameManager.fingers.length,
                                 );
                               }
 

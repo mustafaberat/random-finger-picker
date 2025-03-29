@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../animations/finger_tap_animation.dart';
 import '../animations/winner_animation.dart';
 import '../animations/selection_animation.dart';
+import '../screens/game_screen.dart';
 
 class AnimationManager {
   final Map<int, AnimationController> fingerAnimationControllers = {};
@@ -125,6 +126,25 @@ class AnimationManager {
     selectionController.value = 0;
     winAnimationController.value = 0;
     speedController.value = 0;
+
+    if (GameScreen.kDebugMode) {
+      // Keep only debug finger animations (1-4)
+      final debugControllers = Map<int, AnimationController>.fromEntries(
+        fingerAnimationControllers.entries.where((entry) => entry.key <= 4)
+      );
+      for (var controller in fingerAnimationControllers.values) {
+        if (!debugControllers.containsValue(controller)) {
+          controller.dispose();
+        }
+      }
+      fingerAnimationControllers.clear();
+      fingerAnimationControllers.addAll(debugControllers);
+    } else {
+      for (var controller in fingerAnimationControllers.values) {
+        controller.dispose();
+      }
+      fingerAnimationControllers.clear();
+    }
   }
 
   Animation<double> getWinAnimation() {

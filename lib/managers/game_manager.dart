@@ -48,6 +48,9 @@ class GameManager {
   void removeFinger(int fingerKey) {
     if (!fingers.containsKey(fingerKey)) return;
     
+    // Don't remove debug mode fingers
+    if (GameScreen.kDebugMode && fingerKey <= 4) return;
+    
     fingers.remove(fingerKey);
     fingerColors.remove(fingerKey);
     
@@ -153,22 +156,41 @@ class GameManager {
   void reset() {
     _waitTimer?.cancel();
     _selectionTimer?.cancel();
-    fingers.clear();
-    fingerColors.clear();
+    
+    if (GameScreen.kDebugMode) {
+      // Keep only debug fingers (1-4)
+      final debugFingers = Map<int, Offset>.fromEntries(
+        fingers.entries.where((entry) => entry.key <= 4)
+      );
+      final debugColors = Map<int, Color>.fromEntries(
+        fingerColors.entries.where((entry) => entry.key <= 4)
+      );
+      fingers.clear();
+      fingerColors.clear();
+      fingers.addAll(debugFingers);
+      fingerColors.addAll(debugColors);
+    } else {
+      fingers.clear();
+      fingerColors.clear();
+    }
+    
+    isSelecting = false;
+    isWinAnimationPlaying = false;
     selectedFinger = null;
     currentFingerIndex = 0;
     countdown = GameScreen.kInitialCountdown;
-    isSelecting = false;
-    isWinAnimationPlaying = false;
+    onCountdownChanged(countdown);
     onReset();
   }
 
   Color _getNextColor() {
-    // Get the next available color from the static list
     final usedColors = fingerColors.values.toSet();
-    return GameScreen.kGameColors.firstWhere(
-      (color) => !usedColors.contains(color),
-      orElse: () => GameScreen.kGameColors[0], // Fallback to first color if all are used
-    );
+    final availableColors = GameScreen.kGameColors.where((color) => !usedColors.contains(color)).toList();
+    
+    if (availableColors.isEmpty) {
+      return GameScreen.kGameColors[Random().nextInt(GameScreen.kGameColors.length)];
+    }
+    
+    return availableColors[Random().nextInt(availableColors.length)];
   }
 } 
