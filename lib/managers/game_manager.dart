@@ -225,13 +225,14 @@ class GameManager {
   }
 
   Color _getNextColor() {
-    final usedColors = fingerColors.values.toSet();
-    final availableColors = GameScreen.kGameColors.where((color) => !usedColors.contains(color)).toList();
-    
-    if (availableColors.isEmpty) {
-      return GameScreen.kGameColors[Random().nextInt(GameScreen.kGameColors.length)];
+    // Get the next available number (which will be the index + 1)
+    int nextKey = 1;
+    while (fingers.containsKey(nextKey)) {
+      nextKey++;
     }
     
-    return availableColors[Random().nextInt(availableColors.length)];
+    // Use the index (nextKey - 1) to get the color from the array
+    // If we exceed the array length, wrap around using modulo
+    return GameScreen.kGameColors[(nextKey - 1) % GameScreen.kGameColors.length];
   }
 } 

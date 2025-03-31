@@ -16,7 +16,7 @@ class GameScreen extends StatefulWidget {
   static const Color kBackgroundColor = Color(0xFF202121);
   static const int kMaxFingers = 10; // Maximum number of fingers allowed
   static const String kFontFamily = 'LuckiestGuy'; // Global font family
-  
+
   // Game colors
   static const List<Color> kGameColors = [
     Colors.red,
@@ -28,14 +28,14 @@ class GameScreen extends StatefulWidget {
     Colors.cyan,
     Colors.teal,
     Colors.pink,
-    Colors.amber,
+    Colors.brown,
   ];
-  
+
   // Game timing
   static const int kInitialCountdown = 1; //TODO: default 5, debug icin 2 yaptim
   static const Duration kWinnerShowDuration = Duration(milliseconds: 3000);
   static const Duration kGameResetDelay = Duration(seconds: 3);
-  
+
   // Common animation properties
   static const double kMaxScale = 2.4;
   static const double kFinalScale = 1.2;
@@ -49,23 +49,25 @@ class GameScreen extends StatefulWidget {
   static const double kGlowBlurRadius = 10.0;
   static const double kGlowSpreadRadius = 5.0;
   static const double kGlowOpacity = 0.3;
-  
+
   // Selection animation properties
   static const int kTotalIterations = 15;
   static const double kSpeedMultiplierMin = 0.1;
   static const double kSpeedMultiplierMax = 1.0;
   static const double kProgressDeltaTime = 0.5;
-  static const double kSelectedFingerBorderOpacity = 0.9; // Seçilen parmağın parlaklığı
-  static const double kUnselectedFingerBorderOpacity = 0.15; // Seçilmeyen parmakların parlaklığı
+  static const double kSelectedFingerBorderOpacity =
+      0.9; // Seçilen parmağın parlaklığı
+  static const double kUnselectedFingerBorderOpacity =
+      0.15; // Seçilmeyen parmakların parlaklığı
   static const double kStopDelayDuration = 500; // Duruş gecikmesi süresi (ms)
   static const double kInitialSpeed = 4.0; // Başlangıç hızı
   static const double kFinalSpeed = 0.2; // Son hız
-  
+
   // Finger tap animation properties
   static const Duration kTapDuration = Duration(milliseconds: 300);
   static const double kTapExpandPhase = 0.7; // 0-70% of animation
   static const double kTapShrinkPhase = 0.3; // 70-100% of animation
-  
+
   // Winner animation properties
   static const double kInitialPause = 0.2;
   static const Duration kWinDuration = Duration(milliseconds: 4000);
@@ -74,7 +76,7 @@ class GameScreen extends StatefulWidget {
   static const double kWinnerMaxScale = 8.0;
   static const double kConfettiStartProgress = 0.8;
   static const double kConfettiMultiplier = 5.0;
-  
+
   // Debug mode
   static const bool kDebugMode = true;
 
@@ -86,8 +88,10 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   // Animasyon süreleri
-  static const Duration kSelectionAnimationDuration = SelectionAnimation.duration;
-  static const Duration kFingerTapAnimationDuration = FingerTapAnimation.duration;
+  static const Duration kSelectionAnimationDuration =
+      SelectionAnimation.duration;
+  static const Duration kFingerTapAnimationDuration =
+      FingerTapAnimation.duration;
   static const Duration kWinAnimationDuration = WinnerAnimation.duration;
   static const Duration kPulseAnimationDuration = Duration(milliseconds: 1000);
 
@@ -99,8 +103,9 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _confettiController = ConfettiController(duration: GameScreen.kConfettiDuration);
-    
+    _confettiController =
+        ConfettiController(duration: GameScreen.kConfettiDuration);
+
     _animationManager = AnimationManager(
       vsync: this,
       onSelectionComplete: _onSelectionComplete,
@@ -145,31 +150,34 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     setState(() {
       _isInteractionEnabled = false;
     });
-    
+
     // SelectionAnimation sınıfını resetleyelim
     SelectionAnimation.resetSelectedFinger();
     // Sonra kazanan parmağı ayarlayalım
     SelectionAnimation.setSelectedFinger(_gameManager.selectedFinger!);
-    
+
     _animationManager.startSelectionAnimation();
   }
 
   void _onFinishSelection() {
-    print("🎊 Finish selection - Starting win animation for finger: ${_gameManager.selectedFinger}");
+    print(
+        "🎊 Finish selection - Starting win animation for finger: ${_gameManager.selectedFinger}");
     setState(() {
       // Kazanan parmak UI'da güncellendi
     });
-    
+
     // Win animasyonu için biraz bekleyelim
     Future.delayed(Duration(milliseconds: 100), () {
       _animationManager.startWinAnimation();
       _confettiController.play();
-      print("🎉 Win animation started for finger: ${_gameManager.selectedFinger}");
+      print(
+          "🎉 Win animation started for finger: ${_gameManager.selectedFinger}");
     });
   }
 
   void _onSelectionComplete() {
-    print("🌟 Selection completed - Winning finger: ${_gameManager.selectedFinger}");
+    print(
+        "🌟 Selection completed - Winning finger: ${_gameManager.selectedFinger}");
     _gameManager.finishSelection();
   }
 
@@ -187,11 +195,11 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final selectedColor = _gameManager.selectedFinger != null 
-        ? _gameManager.fingerColors[_gameManager.selectedFinger] 
+    final selectedColor = _gameManager.selectedFinger != null
+        ? _gameManager.fingerColors[_gameManager.selectedFinger]
         : null;
     final winAnimation = _animationManager.getWinAnimation();
-    
+
     return Scaffold(
       backgroundColor: GameScreen.kBackgroundColor,
       body: SafeArea(
@@ -201,10 +209,12 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
             AnimatedBuilder(
               animation: _animationManager.winAnimationController,
               builder: (context, child) {
-                final backgroundColor = _gameManager.isWinAnimationPlaying && selectedColor != null
-                    ? Color.lerp(GameScreen.kBackgroundColor, selectedColor, _animationManager.winAnimationController.value)
-                    : GameScreen.kBackgroundColor;
-                
+                final backgroundColor =
+                    _gameManager.isWinAnimationPlaying && selectedColor != null
+                        ? Color.lerp(GameScreen.kBackgroundColor, selectedColor,
+                            _animationManager.winAnimationController.value)
+                        : GameScreen.kBackgroundColor;
+
                 return Container(
                   width: double.infinity,
                   height: double.infinity,
@@ -213,12 +223,17 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                     children: [
                       // Fingers
                       ..._gameManager.fingers.entries.map((entry) {
-                        final fingerIndex = _gameManager.fingers.keys.toList().indexOf(entry.key);
-                        final isSelected = _gameManager.isSelecting && 
+                        final fingerIndex = _gameManager.fingers.keys
+                            .toList()
+                            .indexOf(entry.key);
+                        final isSelected = _gameManager.isSelecting &&
                             _gameManager.currentFingerIndex == fingerIndex;
-                        final animation = _animationManager.fingerAnimationControllers[entry.key];
-                        final isWinner = _gameManager.selectedFinger == entry.key;
-                        final fingerColor = _gameManager.fingerColors[entry.key];
+                        final animation = _animationManager
+                            .fingerAnimationControllers[entry.key];
+                        final isWinner =
+                            _gameManager.selectedFinger == entry.key;
+                        final fingerColor =
+                            _gameManager.fingerColors[entry.key];
 
                         if (fingerColor == null) return const SizedBox.shrink();
 
@@ -240,11 +255,14 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                           child: AnimatedBuilder(
                             animation: Listenable.merge([
                               animation ?? const AlwaysStoppedAnimation(1.0),
-                              if (_gameManager.isSelecting) _animationManager.selectionController,
-                              if (_gameManager.isWinAnimationPlaying) winAnimation,
+                              if (_gameManager.isSelecting)
+                                _animationManager.selectionController,
+                              if (_gameManager.isWinAnimationPlaying)
+                                winAnimation,
                             ]),
                             builder: (context, child) {
-                              final baseScale = (animation?.value ?? 1.0) * finalScale;
+                              final baseScale =
+                                  (animation?.value ?? 1.0) * finalScale;
                               final tapProgress = animation?.value ?? 1.0;
 
                               if (_gameManager.isWinAnimationPlaying) {
@@ -267,7 +285,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                                   color: fingerColor,
                                   baseScale: baseScale,
                                   isSelected: isSelected,
-                                  selectionProgress: _animationManager.selectionController.value,
+                                  selectionProgress: _animationManager
+                                      .selectionController.value,
                                   fingerIndex: fingerIndex,
                                   totalFingers: _gameManager.fingers.length,
                                   fingerNumber: fingerIndex + 1,
@@ -280,7 +299,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                                   color: fingerColor,
                                   tapProgress: tapProgress,
                                   isSelecting: _gameManager.isSelecting,
-                                  isWinAnimationPlaying: _gameManager.isWinAnimationPlaying,
+                                  isWinAnimationPlaying:
+                                      _gameManager.isWinAnimationPlaying,
                                   fingerNumber: entry.key,
                                 ),
                               );
@@ -303,81 +323,105 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
             // Gesture Detector and UI
             Listener(
               behavior: HitTestBehavior.translucent,
-              onPointerDown: _isInteractionEnabled ? (event) {
-                if (_gameManager.isSelecting || 
-                    _gameManager.selectedFinger != null ||
-                    _gameManager.fingers.length >= GameScreen.kMaxFingers) {
-                  return;
-                }
-                
-                final RenderBox renderBox = context.findRenderObject() as RenderBox;
-                final localPosition = renderBox.globalToLocal(event.position);
-                
-                // Center the circle exactly on the touch point
-                final adjustedPosition = Offset(
-                  localPosition.dx,
-                  localPosition.dy,
-                );
-                
-                // Find the next available number for the finger
-                int nextKey = 1;
-                while (_gameManager.fingers.containsKey(nextKey)) {
-                  nextKey++;
-                }
-                
-                _gameManager.addFinger(nextKey, adjustedPosition);
-                _animationManager.addFingerAnimation(nextKey);
-                setState(() {});
-              } : null,
-              onPointerMove: _isInteractionEnabled ? (event) {
-                if (_gameManager.isSelecting || 
-                    _gameManager.selectedFinger != null) return;
-                
-                final RenderBox renderBox = context.findRenderObject() as RenderBox;
-                final localPosition = renderBox.globalToLocal(event.position);
-                
-                // Find the closest finger to the pointer position
-                final fingerEntry = _gameManager.fingers.entries.firstWhere(
-                  (entry) => (entry.value - localPosition).distance < 50, // 50 pixel tolerance
-                  orElse: () => MapEntry(-1, Offset.zero),
-                );
-                
-                if (fingerEntry.key != -1) {
-                  // Center the circle exactly on the touch point
-                  final adjustedPosition = Offset(
-                    localPosition.dx,
-                    localPosition.dy,
-                  );
-                  
-                  _gameManager.updateFingerPosition(fingerEntry.key, adjustedPosition);
-                  setState(() {});
-                }
-              } : null,
-              onPointerUp: _isInteractionEnabled ? (event) {
-                if (_gameManager.isSelecting || _gameManager.selectedFinger != null) return;
-                
-                // Find the finger by position
-                final RenderBox renderBox = context.findRenderObject() as RenderBox;
-                final localPosition = renderBox.globalToLocal(event.position);
-                
-                // Find the closest finger to the pointer up position
-                final fingerEntry = _gameManager.fingers.entries.firstWhere(
-                  (entry) => (entry.value - localPosition).distance < 50, // 50 pixel tolerance
-                  orElse: () => MapEntry(-1, Offset.zero),
-                );
-                
-                if (fingerEntry.key != -1) {
-                  _gameManager.removeFinger(fingerEntry.key);
-                  _animationManager.removeFingerAnimation(fingerEntry.key);
-                  setState(() {});
-                }
-              } : null,
+              onPointerDown: _isInteractionEnabled
+                  ? (event) {
+                      if (_gameManager.isSelecting ||
+                          _gameManager.selectedFinger != null ||
+                          _gameManager.fingers.length >=
+                              GameScreen.kMaxFingers) {
+                        return;
+                      }
+
+                      final RenderBox renderBox =
+                          context.findRenderObject() as RenderBox;
+                      final localPosition =
+                          renderBox.globalToLocal(event.position);
+
+                      // Center the circle exactly on the touch point
+                      final adjustedPosition = Offset(
+                        localPosition.dx,
+                        localPosition.dy,
+                      );
+
+                      // Find the next available number for the finger
+                      int nextKey = 1;
+                      while (_gameManager.fingers.containsKey(nextKey)) {
+                        nextKey++;
+                      }
+
+                      _gameManager.addFinger(nextKey, adjustedPosition);
+                      _animationManager.addFingerAnimation(nextKey);
+                      setState(() {});
+                    }
+                  : null,
+              onPointerMove: _isInteractionEnabled
+                  ? (event) {
+                      if (_gameManager.isSelecting ||
+                          _gameManager.selectedFinger != null) return;
+
+                      final RenderBox renderBox =
+                          context.findRenderObject() as RenderBox;
+                      final localPosition =
+                          renderBox.globalToLocal(event.position);
+
+                      // Find the closest finger to the pointer position
+                      final fingerEntry =
+                          _gameManager.fingers.entries.firstWhere(
+                        (entry) =>
+                            (entry.value - localPosition).distance <
+                            50, // 50 pixel tolerance
+                        orElse: () => MapEntry(-1, Offset.zero),
+                      );
+
+                      if (fingerEntry.key != -1) {
+                        // Center the circle exactly on the touch point
+                        final adjustedPosition = Offset(
+                          localPosition.dx,
+                          localPosition.dy,
+                        );
+
+                        _gameManager.updateFingerPosition(
+                            fingerEntry.key, adjustedPosition);
+                        setState(() {});
+                      }
+                    }
+                  : null,
+              onPointerUp: _isInteractionEnabled
+                  ? (event) {
+                      if (_gameManager.isSelecting ||
+                          _gameManager.selectedFinger != null) return;
+
+                      // Find the finger by position
+                      final RenderBox renderBox =
+                          context.findRenderObject() as RenderBox;
+                      final localPosition =
+                          renderBox.globalToLocal(event.position);
+
+                      // Find the closest finger to the pointer up position
+                      final fingerEntry =
+                          _gameManager.fingers.entries.firstWhere(
+                        (entry) =>
+                            (entry.value - localPosition).distance <
+                            50, // 50 pixel tolerance
+                        orElse: () => MapEntry(-1, Offset.zero),
+                      );
+
+                      if (fingerEntry.key != -1) {
+                        _gameManager.removeFinger(fingerEntry.key);
+                        _animationManager
+                            .removeFingerAnimation(fingerEntry.key);
+                        setState(() {});
+                      }
+                    }
+                  : null,
               child: Container(
                 width: double.infinity,
                 height: double.infinity,
                 child: Stack(
                   children: [
-                    if (!_gameManager.isSelecting && _gameManager.selectedFinger == null && _gameManager.fingers.length < 2)
+                    if (!_gameManager.isSelecting &&
+                        _gameManager.selectedFinger == null &&
+                        _gameManager.fingers.length < 2)
                       Align(
                         alignment: const Alignment(0, -0.3),
                         child: LayoutBuilder(
@@ -388,7 +432,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                               child: FittedBox(
                                 fit: BoxFit.contain,
                                 child: Text(
-                                  LocalizationService.instance.getString('put_fingers_on', context),
+                                  LocalizationService.instance
+                                      .getString('put_fingers_on', context),
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontFamily: GameScreen.kFontFamily,
@@ -400,7 +445,9 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                           },
                         ),
                       ),
-                    if (!_gameManager.isSelecting && _gameManager.selectedFinger == null && _gameManager.fingers.length >= 2)
+                    if (!_gameManager.isSelecting &&
+                        _gameManager.selectedFinger == null &&
+                        _gameManager.fingers.length >= 2)
                       Center(
                         child: Text(
                           _gameManager.countdown.toString(),
@@ -420,4 +467,6 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       ),
     );
   }
-} 
+}
+
+
