@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
-import '../screens/game_screen.dart';
+import '../constants.dart';
 
 class ConfettiAnimation extends StatefulWidget {
   final ConfettiController controller;
@@ -91,7 +91,7 @@ class _ConfettiAnimationState extends State<ConfettiAnimation> with SingleTicker
                     gravity: 0.2,
                     shouldLoop: false,
                     particleDrag: 0.05,
-                    colors: GameScreen.kGameColors,
+                    colors: GameConstants.kGameColors,
                     child: const SizedBox(width: 1, height: 1),
                   ),
                 ),
@@ -108,11 +108,10 @@ class _ConfettiAnimationState extends State<ConfettiAnimation> with SingleTicker
                     gravity: 0.2,
                     shouldLoop: false,
                     particleDrag: 0.05,
-                    colors: GameScreen.kGameColors,
+                    colors: GameConstants.kGameColors,
                     child: const SizedBox(width: 1, height: 1),
                   ),
                 ),
-                // Sağdan konfeti
                 Align(
                   alignment: Alignment.centerRight,
                   child: ConfettiWidget(
@@ -125,7 +124,7 @@ class _ConfettiAnimationState extends State<ConfettiAnimation> with SingleTicker
                     gravity: 0.2,
                     shouldLoop: false,
                     particleDrag: 0.05,
-                    colors: GameScreen.kGameColors,
+                    colors: GameConstants.kGameColors,
                     child: const SizedBox(width: 1, height: 1),
                   ),
                 ),

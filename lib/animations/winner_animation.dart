@@ -1,10 +1,10 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import '../screens/game_screen.dart';
+import '../constants.dart';
 import '../components/finger_circle.dart';
 
 class WinnerAnimation extends StatelessWidget {
-  static const Duration duration = GameScreen.kWinDuration;
+  static const Duration duration = GameConstants.kWinDuration;
   static const int lucyFingerId = 1;
   static bool _isFirstLog = true;
 
@@ -65,18 +65,18 @@ class WinnerAnimation extends StatelessWidget {
   }
 
   double _calculateDelayedProgress(double progress) {
-    return progress < GameScreen.kInitialPause
+    return progress < GameConstants.kInitialPause
         ? 0.0
-        : Curves.easeOutCubic.transform((progress - GameScreen.kInitialPause) / (1 - GameScreen.kInitialPause)).clamp(0.0, 1.0);
+        : Curves.easeOutCubic.transform((progress - GameConstants.kInitialPause) / (1 - GameConstants.kInitialPause)).clamp(0.0, 1.0);
   }
 
   double _calculateScale(double baseScale, double progress) {
-    return baseScale + (GameScreen.kWinnerMaxScale * progress);
+    return baseScale + (GameConstants.kWinnerMaxScale * progress);
   }
 
   double _calculateConfettiProgress(double progress) {
-    return progress > GameScreen.kConfettiStartProgress 
-        ? (progress - GameScreen.kConfettiStartProgress) * GameScreen.kConfettiMultiplier 
+    return progress > GameConstants.kConfettiStartProgress 
+        ? (progress - GameConstants.kConfettiStartProgress) * GameConstants.kConfettiMultiplier 
         : 0.0;
   }
 }

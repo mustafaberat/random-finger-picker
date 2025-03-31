@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../animations/finger_tap_animation.dart';
 import '../animations/winner_animation.dart';
 import '../animations/selection_animation.dart';
-import '../screens/game_screen.dart';
+import '../constants.dart';
 import 'dart:math';
 
 class AnimationManager {
@@ -36,7 +36,7 @@ class AnimationManager {
       if (status == AnimationStatus.completed) {
         // Animasyon tamamlandığında tekrar çağrılmaya devam edecek
         // Bu _animateNextSelection içinde handling edilecek
-        if (GameScreen.kDebugMode) {
+        if (GameConstants.kDebugMode) {
           print("👉 Selection animation cycle completed");
         }
       }
@@ -83,7 +83,7 @@ class AnimationManager {
     selectionController.stop();
 
     // Kesintisiz seleksiyon için timer kuralım
-    if (GameScreen.kDebugMode) {
+    if (GameConstants.kDebugMode) {
       print("💫 Starting continuous selection animation");
     }
 
@@ -93,7 +93,7 @@ class AnimationManager {
 
   void _animateNextSelection() {
     if (SelectionAnimation.isAnimationCompleted) {
-      if (GameScreen.kDebugMode) {
+      if (GameConstants.kDebugMode) {
         print("✅ AnimationManager: Animation fully completed, calling onSelectionComplete");
       }
       onSelectionComplete();
@@ -106,7 +106,7 @@ class AnimationManager {
       if (!SelectionAnimation.isAnimationCompleted) {
         _animateNextSelection();
       } else {
-        if (GameScreen.kDebugMode) {
+        if (GameConstants.kDebugMode) {
           print("✅ AnimationManager: Animation fully completed (post-cycle), calling onSelectionComplete");
         }
         onSelectionComplete();

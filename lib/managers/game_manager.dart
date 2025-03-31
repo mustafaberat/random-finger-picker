@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import '../screens/game_screen.dart';
+import '../constants.dart';
 import '../animations/selection_animation.dart';
 
 class GameManager {
@@ -12,7 +12,7 @@ class GameManager {
   bool isSelecting = false;
   int? selectedFinger;
   int currentFingerIndex = 0;
-  int countdown = GameScreen.kInitialCountdown;
+  int countdown = GameConstants.kInitialCountdown;
   bool isWinAnimationPlaying = false;
 
   final VoidCallback onStartSelection;
@@ -34,7 +34,7 @@ class GameManager {
 
   void addFinger(int fingerKey, Offset position) {
     if (isSelecting || isWinAnimationPlaying) return;
-    if (fingers.length >= GameScreen.kMaxFingers) return;
+    if (fingers.length >= GameConstants.kMaxFingers) return;
     
     // Find the next available number
     int nextKey = 1;
@@ -81,13 +81,13 @@ class GameManager {
     for (var entry in remainingFingers.entries) {
       fingers[newKey] = entry.value;
       // Assign color based on the new key number
-      fingerColors[newKey] = GameScreen.kGameColors[(newKey - 1) % GameScreen.kGameColors.length];
+      fingerColors[newKey] = GameConstants.kGameColors[(newKey - 1) % GameConstants.kGameColors.length];
       newKey++;
     }
     
     if (fingers.length < 2) {
       _waitTimer?.cancel();
-      countdown = GameScreen.kInitialCountdown;
+      countdown = GameConstants.kInitialCountdown;
       onCountdownChanged(countdown);
     }
     
@@ -100,13 +100,13 @@ class GameManager {
     if (fingers.length < 2 || isSelecting || isWinAnimationPlaying) return;
     
     _waitTimer?.cancel();
-    countdown = GameScreen.kInitialCountdown;
+    countdown = GameConstants.kInitialCountdown;
     onCountdownChanged(countdown);
     
     _waitTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (fingers.length < 2) {
         timer.cancel();
-        countdown = GameScreen.kInitialCountdown;
+        countdown = GameConstants.kInitialCountdown;
         onCountdownChanged(countdown);
         return;
       }
@@ -188,7 +188,7 @@ class GameManager {
     isWinAnimationPlaying = true;
     onFinishSelection();
 
-    Future.delayed(GameScreen.kGameResetDelay, () {
+    Future.delayed(GameConstants.kGameResetDelay, () {
       reset();
     });
   }
@@ -205,7 +205,7 @@ class GameManager {
     isWinAnimationPlaying = false;
     selectedFinger = null;  // Reset selected finger
     currentFingerIndex = 0;
-    countdown = GameScreen.kInitialCountdown;
+    countdown = GameConstants.kInitialCountdown;
     onCountdownChanged(countdown);
     onReset();
   }
@@ -218,7 +218,7 @@ class GameManager {
     }
     
     // Use nextKey directly as index (subtract 1 to convert from 1-based to 0-based indexing)
-    int colorIndex = (nextKey - 1) % GameScreen.kGameColors.length;
-    return GameScreen.kGameColors[colorIndex];
+    int colorIndex = (nextKey - 1) % GameConstants.kGameColors.length;
+    return GameConstants.kGameColors[colorIndex];
   }
 } 

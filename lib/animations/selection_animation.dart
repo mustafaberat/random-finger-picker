@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import '../screens/game_screen.dart';
+import '../constants.dart';
 import '../components/finger_circle.dart';
 
 class SelectionAnimation {
@@ -14,8 +14,8 @@ class SelectionAnimation {
   static double _lastUpdateTime = 0.0; // Son güncelleme zamanını takip etmek için
   
   // Yeni değişkenler - hız kontrolü için
-  static const double _initialSpeed = GameScreen.kInitialSpeed; // Başlangıç hızı (daha hızlı)
-  static const double _finalSpeed = GameScreen.kFinalSpeed; // Son hız (daha yavaş)
+  static const double _initialSpeed = GameConstants.kInitialSpeed; // Başlangıç hızı (daha hızlı)
+  static const double _finalSpeed = GameConstants.kFinalSpeed; // Son hız (daha yavaş)
   static double _currentSpeed = _initialSpeed; // Mevcut hız
   static DateTime? _stopDelayStart; // Duruş gecikmesi için zaman takibi
   
@@ -60,7 +60,7 @@ class SelectionAnimation {
   // Hız değerini güncelle - iterasyon ilerledikçe yavaşlama
   static void _updateSpeed(int currentIteration, int totalFingers) {
     // Toplam beklenen iterasyon sayısı
-    final totalExpectedIterations = totalFingers * GameScreen.kTotalIterations;
+    final totalExpectedIterations = totalFingers * GameConstants.kTotalIterations;
     
     // İterasyonun tamamlanma yüzdesi (0.0 - 1.0 arası)
     final progressPercentage = min(1.0, currentIteration / totalExpectedIterations);
@@ -87,7 +87,7 @@ class SelectionAnimation {
     required int totalFingers,
     required int fingerNumber,
   }) {
-    final baseOpacity = GameScreen.kDarkenedOpacity;
+    final baseOpacity = GameConstants.kDarkenedOpacity;
     
     // Başlangıçta initial log yaz
     if (_isFirstLog) {
@@ -129,7 +129,7 @@ class SelectionAnimation {
     // Minimum iterasyon tamamlandı mı kontrol et
     // 1 tur = totalFingers adımsayısı
     final completedFullTurns = currentIteration ~/ totalFingers;
-    final minimumIterationsCompleted = completedFullTurns >= GameScreen.kTotalIterations;
+    final minimumIterationsCompleted = completedFullTurns >= GameConstants.kTotalIterations;
     
     // Parmak değiştiğinde log yazdır
     if (currentIteration != _lastLoggedFinger) {
@@ -145,7 +145,7 @@ class SelectionAnimation {
       
       // Detaylı durum bilgisi loglayalım
       print('▶️ F${currentFingerNumber} | Iter: $currentIteration | '
-            'Tur: ${completedFullTurns + 1}/${GameScreen.kTotalIterations} | '
+            'Tur: ${completedFullTurns + 1}/${GameConstants.kTotalIterations} | '
             'Progress: ${(_totalProgress * 100).toStringAsFixed(1)}% | '
             'Speed: ${_currentSpeed.toStringAsFixed(2)} | '
             'MinIter: $minimumIterationsCompleted | OnWinner: $isOnSelectedFinger | '
@@ -159,7 +159,7 @@ class SelectionAnimation {
         } else {
           // Duruş gecikmesi süresi (500ms) doldu mu kontrol et
           final delayDuration = DateTime.now().difference(_stopDelayStart!);
-          if (delayDuration.inMilliseconds >= GameScreen.kStopDelayDuration) {
+          if (delayDuration.inMilliseconds >= GameConstants.kStopDelayDuration) {
             // Animasyonu durdur, kazanan parmağı göster
             print('🏆 DURUŞ: Kazanan Parmak: $_selectedFinger | Tur: ${completedFullTurns + 1}');
             _lastLoggedFinger = currentIteration;
@@ -176,7 +176,7 @@ class SelectionAnimation {
         // Devam et, normal log yazdır
         print('🔄 İterasyon: ${currentIteration + 1} | '
               'Geçiş: $transitionText | '
-              'Tur: ${completedFullTurns + 1}/${GameScreen.kTotalIterations} | '
+              'Tur: ${completedFullTurns + 1}/${GameConstants.kTotalIterations} | '
               '🎯 Kazanan: $_selectedFinger | '
               '⚡ Hız: ${_currentSpeed.toStringAsFixed(2)}');
         
@@ -211,8 +211,8 @@ class SelectionAnimation {
     
     // Kazanan parmağa daha parlak bir görünüm ver
     final borderOpacity = isLit 
-        ? (isSelected ? GameScreen.kSelectedFingerBorderOpacity : GameScreen.kBorderOpacity)  // Kazanan parmak daha parlak 
-        : GameScreen.kUnselectedFingerBorderOpacity; // Seçilmeyen parmaklar daha sönük
+        ? (isSelected ? GameConstants.kSelectedFingerBorderOpacity : GameConstants.kBorderOpacity)  // Kazanan parmak daha parlak 
+        : GameConstants.kUnselectedFingerBorderOpacity; // Seçilmeyen parmaklar daha sönük
 
     return FingerCircle(
       color: color,

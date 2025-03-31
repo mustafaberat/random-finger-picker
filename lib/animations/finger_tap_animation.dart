@@ -1,10 +1,10 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import '../screens/game_screen.dart';
+import '../constants.dart';
 import '../components/finger_circle.dart';
 
 class FingerTapAnimation {
-  static const Duration duration = GameScreen.kTapDuration;
+  static const Duration duration = GameConstants.kTapDuration;
 
   static Widget build({
     required Color color,
@@ -15,8 +15,8 @@ class FingerTapAnimation {
   }) {
     // Border opacity with smooth fade in/out
     final borderProgress = tapProgress.clamp(0.0, 1.0);
-    final borderOpacity = (Curves.easeInOut.transform(borderProgress) * GameScreen.kBorderOpacity)
-        .clamp(0.0, GameScreen.kBorderOpacity);
+    final borderOpacity = (Curves.easeInOut.transform(borderProgress) * GameConstants.kBorderOpacity)
+        .clamp(0.0, GameConstants.kBorderOpacity);
 
     return FingerCircle(
       color: color,

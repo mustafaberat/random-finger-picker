@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../screens/game_screen.dart';
+import '../constants.dart';
 
 class FingerCircle extends StatelessWidget {
   static const double kFontSizeRatio = 0.9;
@@ -28,20 +28,20 @@ class FingerCircle extends StatelessWidget {
   double _calculateScale() {
     if (tapProgress != null) {
       // FingerTapAnimation mantığı
-      final maxScale = GameScreen.kMaxScale;
-      final finalRestScale = GameScreen.kFinalScale;
+      final maxScale = GameConstants.kMaxScale;
+      final finalRestScale = GameConstants.kFinalScale;
       final clampedProgress = tapProgress!.clamp(0.0, 1.0);
 
-      if (clampedProgress < GameScreen.kTapExpandPhase) {
+      if (clampedProgress < GameConstants.kTapExpandPhase) {
         // First phase: Expand (0-70% of animation)
         final expandProgress =
-            (clampedProgress / GameScreen.kTapExpandPhase).clamp(0.0, 1.0);
+            (clampedProgress / GameConstants.kTapExpandPhase).clamp(0.0, 1.0);
         return 1.0 +
             ((maxScale - 1.0) * Curves.easeOut.transform(expandProgress));
       } else {
         // Second phase: Shrink (70-100% of animation)
-        final shrinkProgress = ((clampedProgress - GameScreen.kTapExpandPhase) /
-                GameScreen.kTapShrinkPhase)
+        final shrinkProgress = ((clampedProgress - GameConstants.kTapExpandPhase) /
+                GameConstants.kTapShrinkPhase)
             .clamp(0.0, 1.0);
         return maxScale -
             ((maxScale - finalRestScale) *
@@ -74,8 +74,8 @@ class FingerCircle extends StatelessWidget {
 
   Widget _buildOuterCircle() {
     return Container(
-      width: GameScreen.kFingerSize * GameScreen.kOuterBorderScale,
-      height: GameScreen.kFingerSize * GameScreen.kOuterBorderScale,
+      width: GameConstants.kFingerSize * GameConstants.kOuterBorderScale,
+      height: GameConstants.kFingerSize * GameConstants.kOuterBorderScale,
       decoration: BoxDecoration(
         color: color.withOpacity(borderOpacity * 0.3),
         shape: BoxShape.circle,
@@ -85,21 +85,21 @@ class FingerCircle extends StatelessWidget {
 
   Widget _buildMainCircle() {
     return Container(
-      width: GameScreen.kFingerSize,
-      height: GameScreen.kFingerSize,
+      width: GameConstants.kFingerSize,
+      height: GameConstants.kFingerSize,
       decoration: BoxDecoration(
-        color: isLit ? color : color.withOpacity(GameScreen.kDarkenedOpacity),
+        color: isLit ? color : color.withOpacity(GameConstants.kDarkenedOpacity),
         shape: BoxShape.circle,
         border: Border.all(
           color: Colors.white.withOpacity(borderOpacity),
-          width: GameScreen.kBorderWidth,
+          width: GameConstants.kBorderWidth,
         ),
         boxShadow: [
           BoxShadow(
             color: color
-                .withOpacity(GameScreen.kGlowOpacity * (isLit ? 0.7 : 0.3)),
-            blurRadius: GameScreen.kGlowBlurRadius,
-            spreadRadius: GameScreen.kGlowSpreadRadius * 0.7,
+                .withOpacity(GameConstants.kGlowOpacity * (isLit ? 0.7 : 0.3)),
+            blurRadius: GameConstants.kGlowBlurRadius,
+            spreadRadius: GameConstants.kGlowSpreadRadius * 0.7,
           ),
         ],
       ),
@@ -107,15 +107,15 @@ class FingerCircle extends StatelessWidget {
         child: FittedBox(
           fit: BoxFit.scaleDown,
           child: Container(
-            width: GameScreen.kFingerSize,
-            height: GameScreen.kFingerSize,
+            width: GameConstants.kFingerSize,
+            height: GameConstants.kFingerSize,
             alignment: Alignment.center,
             child: Text(
               fingerNumber.toString(),
               style: TextStyle(
-                color: Colors.white.withOpacity(GameScreen.kHighlightBorderOpacity),
-                fontSize: GameScreen.kFingerSize * kFontSizeRatio,
-                fontFamily: GameScreen.kFontFamily,
+                color: Colors.white.withOpacity(GameConstants.kHighlightBorderOpacity),
+                fontSize: GameConstants.kFingerSize * kFontSizeRatio,
+                fontFamily: GameConstants.kFontFamily,
                 fontWeight: FontWeight.bold,
                 shadows: const [
                   Shadow(

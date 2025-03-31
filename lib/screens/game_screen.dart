@@ -9,77 +9,9 @@ import '../animations/confetti_animation.dart';
 import '../managers/game_manager.dart';
 import '../managers/animation_manager.dart';
 import '../services/localization_service.dart';
+import '../constants.dart';
 
 class GameScreen extends StatefulWidget {
-  // Global constants
-  static const double kFingerSize = 100.0;
-  static const Color kBackgroundColor = Color(0xFF202121);
-  static const int kMaxFingers = 10; // Maximum number of fingers allowed
-  static const String kFontFamily = 'LuckiestGuy'; // Global font family
-
-  // Game colors
-  static const List<Color> kGameColors = [
-    Colors.brown,
-    Colors.red,
-    Colors.blue,
-    Colors.yellow,
-    Colors.teal,
-    Colors.orange,
-    Colors.purple,
-    Colors.green,
-    Colors.cyan,
-    Colors.pink,
-  ];
-
-  // Game timing
-  static const int kInitialCountdown = kDebugMode ? 1 : 5;
-  static const Duration kWinnerShowDuration = Duration(milliseconds: 3000);
-  static const Duration kGameResetDelay = Duration(seconds: 3);
-
-  // Common animation properties
-  static const double kMaxScale = 1.6;
-  static const double kFinalScale = 1.2;
-  static const double kPulseScaleFactor = 0.3;
-  static const double kBorderWidth = 3.0;
-  static const double kOuterBorderWidth = 4.0;
-  static const double kOuterBorderScale = 1.30;
-  static const double kBorderOpacity = 0.4;
-  static const double kHighlightBorderOpacity = 0.9;
-  static const double kDarkenedOpacity = 0.2;
-  static const double kGlowBlurRadius = 10.0;
-  static const double kGlowSpreadRadius = 5.0;
-  static const double kGlowOpacity = 0.3;
-
-  // Selection animation properties
-  static const int kTotalIterations = 15;
-  static const double kSpeedMultiplierMin = 0.1;
-  static const double kSpeedMultiplierMax = 1.0;
-  static const double kProgressDeltaTime = 0.5;
-  static const double kSelectedFingerBorderOpacity =
-      0.9; // Seçilen parmağın parlaklığı
-  static const double kUnselectedFingerBorderOpacity =
-      0.15; // Seçilmeyen parmakların parlaklığı
-  static const double kStopDelayDuration = 500; // Duruş gecikmesi süresi (ms)
-  static const double kInitialSpeed = 4.0; // Başlangıç hızı
-  static const double kFinalSpeed = 0.2; // Son hız
-
-  // Finger tap animation properties
-  static const Duration kTapDuration = Duration(milliseconds: 300);
-  static const double kTapExpandPhase = 0.7; // 0-70% of animation
-  static const double kTapShrinkPhase = 0.3; // 70-100% of animation
-
-  // Winner animation properties
-  static const double kInitialPause = 0.2;
-  static const Duration kWinDuration = Duration(milliseconds: 4000);
-  static const Duration kPulseDuration = Duration(milliseconds: 1000);
-  static const Duration kConfettiDuration = Duration(seconds: 5);
-  static const double kWinnerMaxScale = 8.0;
-  static const double kConfettiStartProgress = 0.8;
-  static const double kConfettiMultiplier = 5.0;
-
-  // Debug mode
-  static const bool kDebugMode = false;
-
   const GameScreen({super.key});
 
   @override
@@ -104,7 +36,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _confettiController =
-        ConfettiController(duration: GameScreen.kConfettiDuration);
+        ConfettiController(duration: GameConstants.kConfettiDuration);
 
     _animationManager = AnimationManager(
       vsync: this,
@@ -119,7 +51,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     );
 
     // Add debug fingers if in debug mode
-    if (GameScreen.kDebugMode) {
+    if (GameConstants.kDebugMode) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final size = MediaQuery.of(context).size;
         final centerX = size.width / 2;
@@ -201,7 +133,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     final winAnimation = _animationManager.getWinAnimation();
 
     return Scaffold(
-      backgroundColor: GameScreen.kBackgroundColor,
+      backgroundColor: GameConstants.kBackgroundColor,
       body: SafeArea(
         child: Stack(
           children: [
@@ -211,14 +143,14 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
               builder: (context, child) {
                 final backgroundColor =
                     _gameManager.isWinAnimationPlaying && selectedColor != null
-                        ? Color.lerp(GameScreen.kBackgroundColor, selectedColor,
+                        ? Color.lerp(GameConstants.kBackgroundColor, selectedColor,
                             _animationManager.winAnimationController.value)
-                        : GameScreen.kBackgroundColor;
+                        : GameConstants.kBackgroundColor;
 
                 return Container(
                   width: double.infinity,
                   height: double.infinity,
-                  color: backgroundColor ?? GameScreen.kBackgroundColor,
+                  color: backgroundColor ?? GameConstants.kBackgroundColor,
                   child: Stack(
                     children: [
                       // Fingers
@@ -250,8 +182,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                         }
 
                         return Positioned(
-                          left: entry.value.dx - (GameScreen.kFingerSize / 2),
-                          top: entry.value.dy - (GameScreen.kFingerSize / 2),
+                          left: entry.value.dx - (GameConstants.kFingerSize / 2),
+                          top: entry.value.dy - (GameConstants.kFingerSize / 2),
                           child: AnimatedBuilder(
                             animation: Listenable.merge([
                               animation ?? const AlwaysStoppedAnimation(1.0),
@@ -328,7 +260,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                       if (_gameManager.isSelecting ||
                           _gameManager.selectedFinger != null ||
                           _gameManager.fingers.length >=
-                              GameScreen.kMaxFingers) {
+                              GameConstants.kMaxFingers) {
                         return;
                       }
 
@@ -436,7 +368,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                                       .getString('put_fingers_on', context),
                                   style: const TextStyle(
                                     color: Colors.white,
-                                    fontFamily: GameScreen.kFontFamily,
+                                    fontFamily: GameConstants.kFontFamily,
                                     height: 1,
                                   ),
                                 ),
@@ -454,7 +386,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 72,
-                            fontFamily: GameScreen.kFontFamily,
+                            fontFamily: GameConstants.kFontFamily,
                           ),
                         ),
                       ),
