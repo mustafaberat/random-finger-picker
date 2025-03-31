@@ -69,9 +69,6 @@ class GameManager {
     
     if (fingerEntry.key == -1) return;
     
-    // Don't remove debug mode fingers
-    if (GameScreen.kDebugMode && fingerEntry.key <= 4) return;
-    
     fingers.remove(fingerEntry.key);
     fingerColors.remove(fingerEntry.key);
     

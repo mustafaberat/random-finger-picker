@@ -32,12 +32,12 @@ class GameScreen extends StatefulWidget {
   ];
 
   // Game timing
-  static const int kInitialCountdown = 1; //TODO: default 5, debug icin 2 yaptim
+  static const int kInitialCountdown = kDebugMode ? 1 : 5;
   static const Duration kWinnerShowDuration = Duration(milliseconds: 3000);
   static const Duration kGameResetDelay = Duration(seconds: 3);
 
   // Common animation properties
-  static const double kMaxScale = 2.4;
+  static const double kMaxScale = 1.6;
   static const double kFinalScale = 1.2;
   static const double kPulseScaleFactor = 0.3;
   static const double kBorderWidth = 3.0;
@@ -78,7 +78,7 @@ class GameScreen extends StatefulWidget {
   static const double kConfettiMultiplier = 5.0;
 
   // Debug mode
-  static const bool kDebugMode = true;
+  static const bool kDebugMode = false;
 
   const GameScreen({super.key});
 

@@ -36,7 +36,9 @@ class AnimationManager {
       if (status == AnimationStatus.completed) {
         // Animasyon tamamlandığında tekrar çağrılmaya devam edecek
         // Bu _animateNextSelection içinde handling edilecek
-        print("👉 Selection animation cycle completed");
+        if (GameScreen.kDebugMode) {
+          print("👉 Selection animation cycle completed");
+        }
       }
     });
   }
@@ -53,12 +55,12 @@ class AnimationManager {
     // Stop and remove any existing animation for this finger
     fingerAnimationControllers[fingerKey]?.stop();
     fingerAnimationControllers[fingerKey]?.dispose();
-    
+
     final controller = AnimationController(
       vsync: vsync,
       duration: FingerTapAnimation.duration,
     );
-    
+
     fingerAnimationControllers[fingerKey] = controller;
     controller.forward();
   }
@@ -77,30 +79,36 @@ class AnimationManager {
     for (var controller in fingerAnimationControllers.values) {
       controller.value = 1.0;
     }
-    
+
     selectionController.stop();
-    
+
     // Kesintisiz seleksiyon için timer kuralım
-    print("💫 Starting continuous selection animation");
-    
+    if (GameScreen.kDebugMode) {
+      print("💫 Starting continuous selection animation");
+    }
+
     // Seçim animasyonunu sürekli çalıştır
     _animateNextSelection();
   }
 
   void _animateNextSelection() {
     if (SelectionAnimation.isAnimationCompleted) {
-      print("✅ AnimationManager: Animation fully completed, calling onSelectionComplete");
+      if (GameScreen.kDebugMode) {
+        print("✅ AnimationManager: Animation fully completed, calling onSelectionComplete");
+      }
       onSelectionComplete();
       return;
     }
-    
+
     // Forward hareketi tamamlandığında, tekrar çağır
     selectionController.forward(from: 0).whenComplete(() {
       // Seçim animasyonu tamamlanmadığı sürece devam et
       if (!SelectionAnimation.isAnimationCompleted) {
         _animateNextSelection();
       } else {
-        print("✅ AnimationManager: Animation fully completed (post-cycle), calling onSelectionComplete");
+        if (GameScreen.kDebugMode) {
+          print("✅ AnimationManager: Animation fully completed (post-cycle), calling onSelectionComplete");
+        }
         onSelectionComplete();
       }
     });
@@ -117,24 +125,10 @@ class AnimationManager {
     selectionController.value = 0;
     winAnimationController.value = 0;
 
-    if (GameScreen.kDebugMode) {
-      // Keep only debug finger animations (1-4)
-      final debugControllers = Map<int, AnimationController>.fromEntries(
-        fingerAnimationControllers.entries.where((entry) => entry.key <= 4)
-      );
-      for (var controller in fingerAnimationControllers.values) {
-        if (!debugControllers.containsValue(controller)) {
-          controller.dispose();
-        }
-      }
-      fingerAnimationControllers.clear();
-      fingerAnimationControllers.addAll(debugControllers);
-    } else {
-      for (var controller in fingerAnimationControllers.values) {
-        controller.dispose();
-      }
-      fingerAnimationControllers.clear();
+    for (var controller in fingerAnimationControllers.values) {
+      controller.dispose();
     }
+    fingerAnimationControllers.clear();
   }
 
   Animation<double> getWinAnimation() {
@@ -148,4 +142,4 @@ class AnimationManager {
       CurveTween(curve: Curves.easeInOut),
     );
   }
-} 
+}
