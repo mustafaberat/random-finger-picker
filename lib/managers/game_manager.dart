@@ -101,10 +101,11 @@ class GameManager {
     currentFingerIndex = 0;
     
     final fingerKeys = fingers.keys.toList();
-    // Always select Lucy's finger (assuming it's finger ID 1)
-    selectedFinger = 1;  // Lucy's finger ID
+    // Randomly select a finger
+    final random = Random();
+    selectedFinger = fingerKeys[random.nextInt(fingerKeys.length)];
     SelectionAnimation.setSelectedFinger(selectedFinger!);
-    print('Lucy\'s finger selected: $selectedFinger');
+    print('Manager choose winner finger: $selectedFinger');
     
     _cycleFingers();
     onStartSelection();
