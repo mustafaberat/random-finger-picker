@@ -19,29 +19,29 @@ class WinnerAnimation {
       _isFirstLog = false;
     }
 
-    // Enhanced animation phases with slower timing
-    final initialPause = 0.6; // Initial pause for selection animation
-    final glowDuration = 0.9; // Longer glow phase
+    // Daha smooth timing için ayarlanmış değerler
+    final initialPause = 0.4; // Daha kısa başlangıç duraklaması
+    final glowDuration = 0.7; // Daha kısa glow fazı
     
-    // Calculate phase-specific progress with slower easing
+    // Daha yumuşak progress hesaplaması
     final delayedProgress = progress < initialPause 
         ? 0.0 
-        : ((progress - initialPause) / (1 - initialPause)).clamp(0.0, 1.0);
+        : Curves.easeOutCubic.transform((progress - initialPause) / (1 - initialPause)).clamp(0.0, 1.0);
     
-    // Slower scale up animation with gentler easing
-    final scaleProgress = Curves.easeOutCirc.transform(delayedProgress);
-    final targetScale = 50.0; // Even larger to ensure full screen coverage
-    final currentScale = baseScale + (targetScale * scaleProgress * scaleProgress); // Square the progress for even slower growth
+    // Daha smooth scale animasyonu
+    final scaleProgress = Curves.easeOutCubic.transform(delayedProgress);
+    final targetScale = 40.0; // Daha makul bir maksimum scale
+    final currentScale = baseScale + (targetScale * scaleProgress);
 
-    // Enhanced glow effect that intensifies during the animation
+    // Daha yumuşak glow efekti
     final glowProgress = progress > (1 - glowDuration)
-        ? ((progress - (1 - glowDuration)) / glowDuration).clamp(0.0, 1.0)
+        ? Curves.easeInOut.transform((progress - (1 - glowDuration)) / glowDuration).clamp(0.0, 1.0)
         : 0.0;
-    final glowIntensity = Curves.easeInOut.transform(glowProgress);
+    final glowIntensity = glowProgress;
 
-    // More dramatic pulse effect for the final phase
+    // Daha hafif pulse efekti
     final pulseEffect = progress > 0.6 
-        ? sin((progress - 0.6) * 4 * pi) * 0.08 * (1 - ((progress - 0.6) / 0.4))
+        ? sin((progress - 0.6) * 3 * pi) * 0.05 * (1 - ((progress - 0.6) / 0.4))
         : 0.0;
 
     return Center(
@@ -54,38 +54,22 @@ class WinnerAnimation {
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // Multiple layers of glow for more dramatic effect
-              if (glowProgress > 0) ...[
-                Container(
-                  width: GameScreen.kFingerSize * 1.5,
-                  height: GameScreen.kFingerSize * 1.5,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: color.withOpacity((0.4 * glowIntensity).clamp(0.0, 1.0)),
-                        blurRadius: 40 * (1 + glowIntensity),
-                        spreadRadius: 20 * glowIntensity,
-                      ),
-                    ],
-                  ),
+              // Optimize edilmiş glow efekti
+              if (glowProgress > 0) Container(
+                width: GameScreen.kFingerSize * 1.3,
+                height: GameScreen.kFingerSize * 1.3,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: color.withOpacity(0.3 * glowIntensity),
+                      blurRadius: 30 * (1 + glowIntensity),
+                      spreadRadius: 15 * glowIntensity,
+                    ),
+                  ],
                 ),
-                Container(
-                  width: GameScreen.kFingerSize * 1.2,
-                  height: GameScreen.kFingerSize * 1.2,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.white.withOpacity((0.3 * glowIntensity).clamp(0.0, 1.0)),
-                        blurRadius: 25 * (1 + glowIntensity),
-                        spreadRadius: 10 * glowIntensity,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-              // Main circle with enhanced effects
+              ),
+              // Ana circle container
               Container(
                 width: GameScreen.kFingerSize,
                 height: GameScreen.kFingerSize,
@@ -93,25 +77,25 @@ class WinnerAnimation {
                   color: color,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.white.withOpacity((0.9 - (0.4 * scaleProgress)).clamp(0.0, 1.0)),
-                    width: 5.0 * (1.0 - (0.6 * scaleProgress)),
+                    color: Colors.white.withOpacity(0.9 - (0.4 * scaleProgress)),
+                    width: 4.0 * (1.0 - (0.5 * scaleProgress)),
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: color.withOpacity((0.6 * (1 - scaleProgress)).clamp(0.0, 1.0)),
-                      blurRadius: 25 * (1.0 + scaleProgress),
-                      spreadRadius: 15 * (1.0 + scaleProgress),
+                      color: color.withOpacity(0.4 * (1 - scaleProgress)),
+                      blurRadius: 20 * (1.0 + scaleProgress),
+                      spreadRadius: 10 * (1.0 + scaleProgress),
                     ),
                     if (glowProgress > 0) BoxShadow(
-                      color: Colors.white.withOpacity((0.4 * glowIntensity).clamp(0.0, 1.0)),
-                      blurRadius: 20 * glowIntensity,
-                      spreadRadius: 8 * glowIntensity,
+                      color: Colors.white.withOpacity(0.3 * glowIntensity),
+                      blurRadius: 15 * glowIntensity,
+                      spreadRadius: 5 * glowIntensity,
                     ),
                   ],
                 ),
                 child: Center(
                   child: Transform.scale(
-                    scale: 1.0 + (scaleProgress * 0.5), // Numarayı da büyüt ama daha kontrollü
+                    scale: 1.0 + (scaleProgress * 0.3),
                     child: Text(
                       fingerNumber.toString(),
                       textAlign: TextAlign.center,
