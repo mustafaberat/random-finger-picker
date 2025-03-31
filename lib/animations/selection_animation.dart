@@ -14,9 +14,10 @@ class SelectionAnimation {
   static double _lastUpdateTime = 0.0; // Son güncelleme zamanını takip etmek için
   
   // Yeni değişkenler - hız kontrolü için
-  static const double _initialSpeed = 6.0; // Başlangıç hızı (daha hızlı)
-  static const double _finalSpeed = 0.3; // Son hız (daha yavaş)
+  static const double _initialSpeed = GameScreen.kInitialSpeed; // Başlangıç hızı (daha hızlı)
+  static const double _finalSpeed = GameScreen.kFinalSpeed; // Son hız (daha yavaş)
   static double _currentSpeed = _initialSpeed; // Mevcut hız
+  static DateTime? _stopDelayStart; // Duruş gecikmesi için zaman takibi
   
   // Seçilen parmağı dışarıdan erişilebilir yap
   static int? get selectedFinger => _selectedFinger;
@@ -46,6 +47,7 @@ class SelectionAnimation {
     _lastUpdateTime = 0.0; // Son güncelleme zamanını sıfırla
     _isAnimationStopped = false; // Animasyon durma flag'ini resetle
     _currentSpeed = _initialSpeed; // Hızı sıfırla
+    _stopDelayStart = null; // Duruş gecikmesi zamanını sıfırla
   }
 
   // İlk log mesajını yazdır
@@ -150,14 +152,26 @@ class SelectionAnimation {
             'ShouldStop: $shouldStop | Target: $_selectedFinger');
       
       if (shouldStop) {
-        // Animasyonu durdur, kazanan parmağı göster
-        print('🏆 DURUŞ: Kazanan Parmak: $_selectedFinger | Tur: ${completedFullTurns + 1}');
-        _lastLoggedFinger = currentIteration;
-        _previousFingerNumber = currentFingerNumber;
-        
-        // Bu kritik! Animasyonu tamamen durduruyoruz
-        _isAnimationStopped = true;
-        print('🛑 Animation stopped: _isAnimationStopped set to true');
+        // Eğer henüz duruş gecikmesi başlamadıysa başlat
+        if (_stopDelayStart == null) {
+          _stopDelayStart = DateTime.now();
+          print('⏳ Duruş gecikmesi başladı...');
+        } else {
+          // Duruş gecikmesi süresi (500ms) doldu mu kontrol et
+          final delayDuration = DateTime.now().difference(_stopDelayStart!);
+          if (delayDuration.inMilliseconds >= GameScreen.kStopDelayDuration) {
+            // Animasyonu durdur, kazanan parmağı göster
+            print('🏆 DURUŞ: Kazanan Parmak: $_selectedFinger | Tur: ${completedFullTurns + 1}');
+            _lastLoggedFinger = currentIteration;
+            _previousFingerNumber = currentFingerNumber;
+            
+            // Bu kritik! Animasyonu tamamen durduruyoruz
+            _isAnimationStopped = true;
+            print('🛑 Animation stopped: _isAnimationStopped set to true');
+          } else {
+            print('⏳ Duruş gecikmesi devam ediyor... ${delayDuration.inMilliseconds}ms');
+          }
+        }
       } else {
         // Devam et, normal log yazdır
         print('🔄 İterasyon: ${currentIteration + 1} | '
@@ -197,8 +211,8 @@ class SelectionAnimation {
     
     // Kazanan parmağa daha parlak bir görünüm ver
     final borderOpacity = isLit 
-        ? (isSelected ? 0.8 : GameScreen.kBorderOpacity)  // Kazanan parmak daha parlak 
-        : (GameScreen.kBorderOpacity * 0.3).clamp(0.0, GameScreen.kBorderOpacity);
+        ? (isSelected ? GameScreen.kSelectedFingerBorderOpacity : GameScreen.kBorderOpacity)  // Kazanan parmak daha parlak 
+        : GameScreen.kUnselectedFingerBorderOpacity; // Seçilmeyen parmaklar daha sönük
 
     return FingerCircle(
       color: color,

@@ -55,6 +55,11 @@ class GameScreen extends StatefulWidget {
   static const double kSpeedMultiplierMin = 0.1;
   static const double kSpeedMultiplierMax = 1.0;
   static const double kProgressDeltaTime = 0.5;
+  static const double kSelectedFingerBorderOpacity = 0.9; // Seçilen parmağın parlaklığı
+  static const double kUnselectedFingerBorderOpacity = 0.15; // Seçilmeyen parmakların parlaklığı
+  static const double kStopDelayDuration = 500; // Duruş gecikmesi süresi (ms)
+  static const double kInitialSpeed = 4.0; // Başlangıç hızı
+  static const double kFinalSpeed = 0.2; // Son hız
   
   // Finger tap animation properties
   static const Duration kTapDuration = Duration(milliseconds: 300);
