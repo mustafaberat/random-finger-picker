@@ -198,22 +198,9 @@ class GameManager {
     _waitTimer?.cancel();
     _selectionTimer?.cancel();
     
-    if (GameScreen.kDebugMode) {
-      // Keep only debug fingers (1-4)
-      final debugFingers = Map<int, Offset>.fromEntries(
-        fingers.entries.where((entry) => entry.key <= 4)
-      );
-      final debugColors = Map<int, Color>.fromEntries(
-        fingerColors.entries.where((entry) => entry.key <= 4)
-      );
-      fingers.clear();
-      fingerColors.clear();
-      fingers.addAll(debugFingers);
-      fingerColors.addAll(debugColors);
-    } else {
-      fingers.clear();
-      fingerColors.clear();
-    }
+    // Clear all fingers and colors regardless of debug mode
+    fingers.clear();
+    fingerColors.clear();
     
     isSelecting = false;
     isWinAnimationPlaying = false;
