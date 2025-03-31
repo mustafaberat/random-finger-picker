@@ -51,7 +51,7 @@ class GameScreen extends StatefulWidget {
   static const double kGlowOpacity = 0.3;
   
   // Selection animation properties
-  static const int kTotalIterations = 20;
+  static const int kTotalIterations = 15;
   static const double kSpeedMultiplierMin = 0.1;
   static const double kSpeedMultiplierMax = 1.0;
   static const double kProgressDeltaTime = 0.5;
@@ -76,7 +76,7 @@ class GameScreen extends StatefulWidget {
   static const double kConfettiMultiplier = 5.0;
   
   // Debug mode
-  static const bool kDebugMode = false;
+  static const bool kDebugMode = true;
 
   const GameScreen({super.key});
 
@@ -119,19 +119,16 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
         final size = MediaQuery.of(context).size;
         final centerX = size.width / 2;
         final centerY = size.height / 2;
-        final spacing = 300.0;
+        final radius = 300.0;
 
-        // Add 4 fingers in a cross pattern
-        _gameManager.addFinger(1, Offset(centerX, centerY - spacing));
-        _gameManager.addFinger(2, Offset(centerX + spacing, centerY));
-        _gameManager.addFinger(3, Offset(centerX, centerY + spacing));
-        _gameManager.addFinger(4, Offset(centerX - spacing, centerY));
-
-        // Add animations for debug fingers
-        _animationManager.addFingerAnimation(1);
-        _animationManager.addFingerAnimation(2);
-        _animationManager.addFingerAnimation(3);
-        _animationManager.addFingerAnimation(4);
+        // Add 10 fingers in a circular pattern
+        for (int i = 1; i <= 10; i++) {
+          final angle = (i - 1) * (2 * pi / 12);
+          final x = centerX + radius * cos(angle);
+          final y = centerY + radius * sin(angle);
+          _gameManager.addFinger(i, Offset(x, y));
+          _animationManager.addFingerAnimation(i);
+        }
       });
     }
   }
