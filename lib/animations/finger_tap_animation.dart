@@ -75,7 +75,7 @@ class FingerTapAnimation {
                 fingerNumber.toString(),
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: GameScreen.kFingerSize * 0.4,
+                  fontSize: GameScreen.kFingerSize * 0.9,
                   fontFamily: GameScreen.kFontFamily,
                   fontWeight: FontWeight.bold,
                   shadows: [

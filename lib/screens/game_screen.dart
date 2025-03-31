@@ -228,7 +228,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                                 if (isWinner) {
                                   return Transform.scale(
                                     scale: 1.0,
-                                    child: WinnerAnimation.build(
+                                    child: WinnerAnimation.create(
                                       color: fingerColor,
                                       progress: winAnimation.value,
                                       baseScale: baseScale,
