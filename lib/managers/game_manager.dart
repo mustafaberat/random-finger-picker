@@ -36,24 +36,55 @@ class GameManager {
     if (isSelecting || isWinAnimationPlaying) return;
     if (fingers.length >= GameScreen.kMaxFingers) return;
     
-    fingers[fingerKey] = position;
-    fingerColors[fingerKey] = _getNextColor();
+    // Find the next available number
+    int nextKey = 1;
+    while (fingers.containsKey(nextKey)) {
+      nextKey++;
+    }
+    
+    fingers[nextKey] = position;
+    fingerColors[nextKey] = _getNextColor();
     _resetWaitTimer();
   }
 
   void updateFingerPosition(int fingerKey, Offset position) {
-    if (!fingers.containsKey(fingerKey) || isSelecting || isWinAnimationPlaying) return;
-    fingers[fingerKey] = position;
+    // Find the finger by position instead of key
+    final fingerEntry = fingers.entries.firstWhere(
+      (entry) => (entry.value - position).distance < 50, // 50 pixel tolerance
+      orElse: () => MapEntry(-1, Offset.zero),
+    );
+    
+    if (fingerEntry.key == -1 || isSelecting || isWinAnimationPlaying) return;
+    fingers[fingerEntry.key] = position;
   }
 
   void removeFinger(int fingerKey) {
-    if (!fingers.containsKey(fingerKey)) return;
+    // Find the finger by position instead of key
+    final fingerEntry = fingers.entries.firstWhere(
+      (entry) => entry.key == fingerKey,
+      orElse: () => MapEntry(-1, Offset.zero),
+    );
+    
+    if (fingerEntry.key == -1) return;
     
     // Don't remove debug mode fingers
-    if (GameScreen.kDebugMode && fingerKey <= 4) return;
+    if (GameScreen.kDebugMode && fingerEntry.key <= 4) return;
     
-    fingers.remove(fingerKey);
-    fingerColors.remove(fingerKey);
+    fingers.remove(fingerEntry.key);
+    fingerColors.remove(fingerEntry.key);
+    
+    // Renumber remaining fingers starting from 1
+    final remainingFingers = Map<int, Offset>.from(fingers);
+    final remainingColors = Map<int, Color>.from(fingerColors);
+    fingers.clear();
+    fingerColors.clear();
+    
+    int newKey = 1;
+    for (var entry in remainingFingers.entries) {
+      fingers[newKey] = entry.value;
+      fingerColors[newKey] = remainingColors[entry.key]!;
+      newKey++;
+    }
     
     if (fingers.length < 2) {
       _waitTimer?.cancel();
@@ -186,6 +217,7 @@ class GameManager {
     
     isSelecting = false;
     isWinAnimationPlaying = false;
+    selectedFinger = null;  // Reset selected finger
     currentFingerIndex = 0;
     countdown = GameScreen.kInitialCountdown;
     onCountdownChanged(countdown);

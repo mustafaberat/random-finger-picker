@@ -76,7 +76,7 @@ class GameScreen extends StatefulWidget {
   static const double kConfettiMultiplier = 5.0;
   
   // Debug mode
-  static const bool kDebugMode = true;
+  static const bool kDebugMode = false;
 
   const GameScreen({super.key});
 
@@ -322,32 +322,56 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                   localPosition.dy,
                 );
                 
-                _gameManager.addFinger(event.pointer, adjustedPosition);
-                _animationManager.addFingerAnimation(event.pointer);
+                // Find the next available number for the finger
+                int nextKey = 1;
+                while (_gameManager.fingers.containsKey(nextKey)) {
+                  nextKey++;
+                }
+                
+                _gameManager.addFinger(nextKey, adjustedPosition);
+                _animationManager.addFingerAnimation(nextKey);
                 setState(() {});
               } : null,
               onPointerMove: _isInteractionEnabled ? (event) {
                 if (_gameManager.isSelecting || 
-                    _gameManager.selectedFinger != null ||
-                    !_gameManager.fingers.containsKey(event.pointer)) return;
+                    _gameManager.selectedFinger != null) return;
                 
                 final RenderBox renderBox = context.findRenderObject() as RenderBox;
                 final localPosition = renderBox.globalToLocal(event.position);
                 
-                // Center the circle exactly on the touch point
-                final adjustedPosition = Offset(
-                  localPosition.dx,
-                  localPosition.dy,
+                // Find the closest finger to the pointer position
+                final fingerEntry = _gameManager.fingers.entries.firstWhere(
+                  (entry) => (entry.value - localPosition).distance < 50, // 50 pixel tolerance
+                  orElse: () => MapEntry(-1, Offset.zero),
                 );
                 
-                _gameManager.updateFingerPosition(event.pointer, adjustedPosition);
-                setState(() {});
+                if (fingerEntry.key != -1) {
+                  // Center the circle exactly on the touch point
+                  final adjustedPosition = Offset(
+                    localPosition.dx,
+                    localPosition.dy,
+                  );
+                  
+                  _gameManager.updateFingerPosition(fingerEntry.key, adjustedPosition);
+                  setState(() {});
+                }
               } : null,
               onPointerUp: _isInteractionEnabled ? (event) {
                 if (_gameManager.isSelecting || _gameManager.selectedFinger != null) return;
-                if (_gameManager.fingers.containsKey(event.pointer)) {
-                  _gameManager.removeFinger(event.pointer);
-                  _animationManager.removeFingerAnimation(event.pointer);
+                
+                // Find the finger by position
+                final RenderBox renderBox = context.findRenderObject() as RenderBox;
+                final localPosition = renderBox.globalToLocal(event.position);
+                
+                // Find the closest finger to the pointer up position
+                final fingerEntry = _gameManager.fingers.entries.firstWhere(
+                  (entry) => (entry.value - localPosition).distance < 50, // 50 pixel tolerance
+                  orElse: () => MapEntry(-1, Offset.zero),
+                );
+                
+                if (fingerEntry.key != -1) {
+                  _gameManager.removeFinger(fingerEntry.key);
+                  _animationManager.removeFingerAnimation(fingerEntry.key);
                   setState(() {});
                 }
               } : null,
