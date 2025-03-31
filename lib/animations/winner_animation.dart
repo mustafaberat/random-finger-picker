@@ -65,19 +65,19 @@ class WinnerAnimation extends StatelessWidget {
   }
 
   double _calculateDelayedProgress(double progress) {
-    const double initialPause = 0.2;
-    return progress < initialPause
+    return progress < GameScreen.kInitialPause
         ? 0.0
-        : Curves.easeOutCubic.transform((progress - initialPause) / (1 - initialPause)).clamp(0.0, 1.0);
+        : Curves.easeOutCubic.transform((progress - GameScreen.kInitialPause) / (1 - GameScreen.kInitialPause)).clamp(0.0, 1.0);
   }
 
   double _calculateScale(double baseScale, double progress) {
-    const double maxScale = 8.0; //Ne kadar buyuyecek
-    return baseScale + (maxScale * progress);
+    return baseScale + (GameScreen.kWinnerMaxScale * progress);
   }
 
   double _calculateConfettiProgress(double progress) {
-    return progress > 0.8 ? (progress - 0.8) * 5 : 0.0;
+    return progress > GameScreen.kConfettiStartProgress 
+        ? (progress - GameScreen.kConfettiStartProgress) * GameScreen.kConfettiMultiplier 
+        : 0.0;
   }
 }
 

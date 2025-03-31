@@ -36,32 +36,44 @@ class GameScreen extends StatefulWidget {
   static const Duration kWinnerShowDuration = Duration(milliseconds: 3000);
   static const Duration kGameResetDelay = Duration(seconds: 3);
   
-  // Animation durations
-  static const Duration kSelectionInterval = Duration(milliseconds: 200);
-  static const Duration kSelectionDuration = Duration(milliseconds: 2000);
-  static const Duration kTapDuration = Duration(milliseconds: 300);
-  static const Duration kWinDuration = Duration(milliseconds: 4000);
-  static const Duration kPulseDuration = Duration(milliseconds: 1000);
-  static const Duration kConfettiDuration = Duration(seconds: 5);
-  
-  // Animation scales
+  // Common animation properties
   static const double kMaxScale = 2.4;
   static const double kFinalScale = 1.2;
   static const double kPulseScaleFactor = 0.3;
-  
-  // Circle appearance
   static const double kBorderWidth = 3.0;
   static const double kOuterBorderWidth = 4.0;
   static const double kOuterBorderScale = 1.30;
   static const double kBorderOpacity = 0.4;
   static const double kHighlightBorderOpacity = 0.8;
   static const double kDarkenedOpacity = 0.5;
-  
-  // Glow effects
   static const double kGlowBlurRadius = 10.0;
   static const double kGlowSpreadRadius = 5.0;
   static const double kGlowOpacity = 0.3;
-  static const bool kDebugMode = true; // Debug mode flag
+  
+  // Selection animation properties
+  static const Duration kSelectionInterval = Duration(milliseconds: 200);
+  static const Duration kSelectionDuration = Duration(milliseconds: 2000);
+  static const int kTotalIterations = 20000;
+  static const double kInitialPause = 0.2;
+  static const double kSpeedMultiplierMin = 0.1;
+  static const double kSpeedMultiplierMax = 1.0;
+  static const double kProgressDeltaTime = 0.5;
+  
+  // Finger tap animation properties
+  static const Duration kTapDuration = Duration(milliseconds: 300);
+  static const double kTapExpandPhase = 0.7; // 0-70% of animation
+  static const double kTapShrinkPhase = 0.3; // 70-100% of animation
+  
+  // Winner animation properties
+  static const Duration kWinDuration = Duration(milliseconds: 4000);
+  static const Duration kPulseDuration = Duration(milliseconds: 1000);
+  static const Duration kConfettiDuration = Duration(seconds: 5);
+  static const double kWinnerMaxScale = 8.0;
+  static const double kConfettiStartProgress = 0.8;
+  static const double kConfettiMultiplier = 5.0;
+  
+  // Debug mode
+  static const bool kDebugMode = true;
 
   const GameScreen({super.key});
 

@@ -32,13 +32,13 @@ class FingerCircle extends StatelessWidget {
       final finalRestScale = GameScreen.kFinalScale;
       final clampedProgress = tapProgress!.clamp(0.0, 1.0);
       
-      if (clampedProgress < 0.7) {
+      if (clampedProgress < GameScreen.kTapExpandPhase) {
         // First phase: Expand (0-70% of animation)
-        final expandProgress = (clampedProgress / 0.7).clamp(0.0, 1.0);
+        final expandProgress = (clampedProgress / GameScreen.kTapExpandPhase).clamp(0.0, 1.0);
         return 1.0 + ((maxScale - 1.0) * Curves.easeOut.transform(expandProgress));
       } else {
         // Second phase: Shrink (70-100% of animation)
-        final shrinkProgress = ((clampedProgress - 0.7) / 0.3).clamp(0.0, 1.0);
+        final shrinkProgress = ((clampedProgress - GameScreen.kTapExpandPhase) / GameScreen.kTapShrinkPhase).clamp(0.0, 1.0);
         return maxScale - ((maxScale - finalRestScale) * Curves.easeInOut.transform(shrinkProgress));
       }
     } else if (baseScale != null) {
@@ -100,7 +100,7 @@ class FingerCircle extends StatelessWidget {
         child: FittedBox(
           fit: BoxFit.scaleDown,
           child: Container(
-            width: GameScreen.kFingerSize ,
+            width: GameScreen.kFingerSize,
             height: GameScreen.kFingerSize,
             alignment: Alignment.center,
             child: Text(

@@ -4,7 +4,6 @@ import '../screens/game_screen.dart';
 import '../components/finger_circle.dart';
 
 class SelectionAnimation {
-  static const int totalIterations = 20000; // Toplam iterasyon sayısını artırdık
   static const Duration duration = Duration(milliseconds: 0); // Dummy
   static int _lastLoggedFinger = -1; // Son loglanan parmağı takip etmek için
   static bool _isFirstLog = true; // İlk log için kontrol
@@ -45,7 +44,7 @@ class SelectionAnimation {
         : "$_previousFingerNumber ➔ $currentFingerNumber";
     
     // Sadece toplam iterasyon sayısına ulaşıldığında dur
-    final shouldStop = currentIteration >= totalIterations;
+    final shouldStop = currentIteration >= GameScreen.kTotalIterations;
     
     return {
       'currentFingerNumber': currentFingerNumber,
@@ -56,7 +55,7 @@ class SelectionAnimation {
 
   // Log mesajını yazdır
   static void _printLog(int currentIteration, double calculatedProgress, String transitionText) {
-    final iterationText = currentIteration >= totalIterations 
+    final iterationText = currentIteration >= GameScreen.kTotalIterations 
         ? '${currentIteration + 1}+' 
         : '${currentIteration + 1}';
     
@@ -64,7 +63,7 @@ class SelectionAnimation {
         ? DateTime.now().difference(_startTime!).inMilliseconds 
         : 0;
     
-    print('İterasyon: $iterationText/$totalIterations | '
+    print('İterasyon: $iterationText/${GameScreen.kTotalIterations} | '
           'İlerleme: ${calculatedProgress.toStringAsFixed(1)}% | '
           'Geçiş: $transitionText | '
           '🎯 Kazanan: $_selectedFinger | '
@@ -90,17 +89,17 @@ class SelectionAnimation {
     final baseOpacity = GameScreen.kDarkenedOpacity;
     
     // Mevcut iterasyonu hesapla
-    final currentIteration = (_totalProgress * totalIterations).floor();
+    final currentIteration = (_totalProgress * GameScreen.kTotalIterations).floor();
     
     // İlerleme hızını hesapla (0-1 arasında)
     double speedMultiplier;
-    if (currentIteration >= totalIterations) {
+    if (currentIteration >= GameScreen.kTotalIterations) {
       // Son aşamada çok yavaş ilerleme
       speedMultiplier = 0.0001;
     } else {
       // Başlangıçta hızlı, sonra yavaşlayan ilerleme
       final progressRatio = _totalProgress / 1.0;
-      speedMultiplier = (1.0 - (progressRatio * 0.9)).clamp(0.1, 1.0);
+      speedMultiplier = (1.0 - (progressRatio * 0.9)).clamp(GameScreen.kSpeedMultiplierMin, GameScreen.kSpeedMultiplierMax);
     }
     
     // Zaman bazlı ilerleme güncellemesi
@@ -112,7 +111,7 @@ class SelectionAnimation {
       _lastUpdateTime = currentTime;
       
       // İlerlemeyi güncelle - daha yavaş ilerleme için çarpanı azalttık
-      _totalProgress = (_totalProgress + (deltaTime * 0.5 * speedMultiplier)).clamp(0.0, 1.0);
+      _totalProgress = (_totalProgress + (deltaTime * GameScreen.kProgressDeltaTime * speedMultiplier)).clamp(0.0, 1.0);
     }
     
     // İlerleme değerini hesapla (0-100 arasında)
@@ -135,7 +134,7 @@ class SelectionAnimation {
 
     // Parmakları sırayla göster
     final currentFingerNumber = (currentIteration % totalFingers) + 1;
-    final isLit = currentIteration >= totalIterations
+    final isLit = currentIteration >= GameScreen.kTotalIterations
         ? fingerIndex == (_selectedFinger! - 1) // Kazanan parmağı göster
         : currentIteration % totalFingers == fingerIndex;
 
