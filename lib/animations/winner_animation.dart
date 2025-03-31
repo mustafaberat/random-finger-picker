@@ -105,21 +105,21 @@ class WinnerAnimation extends StatelessWidget {
             child: AnimatedScale(
               scale: currentScale * 0.7,
               duration: const Duration(milliseconds: 100),
-              child: Text(
-                fingerNumber.toString(),
-                style: TextStyle(
-                  color: Colors.white,
+                  child: Text(
+                    fingerNumber.toString(),
+                    style: TextStyle(
+                      color: Colors.white,
                   fontSize: GameScreen.kFingerSize * 0.9,
-                  fontFamily: GameScreen.kFontFamily,
-                  fontWeight: FontWeight.bold,
-                  shadows: const [
-                    Shadow(
-                      color: Colors.black26,
-                      blurRadius: 4,
-                      offset: Offset(2, 2),
+                      fontFamily: GameScreen.kFontFamily,
+                      fontWeight: FontWeight.bold,
+                      shadows: const [
+                        Shadow(
+                          color: Colors.black26,
+                          blurRadius: 4,
+                          offset: Offset(2, 2),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
               ),
             ),
           ),
@@ -143,7 +143,7 @@ class WinnerAnimation extends StatelessWidget {
   }
 
   double _calculateScale(double baseScale, double progress) {
-    const double maxScale = 8.0;
+    const double maxScale = 8.0; //Ne kadar buyuyecek
     return baseScale + (maxScale * progress);
   }
 
