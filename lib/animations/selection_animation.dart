@@ -16,6 +16,10 @@ class SelectionAnimation {
   // Seçilen parmağı dışarıdan erişilebilir yap
   static int? get selectedFinger => _selectedFinger;
   
+  // Animasyonun tamamlanıp tamamlanmadığını kontrol et
+  static bool _isAnimationStopped = false;
+  static bool get isAnimationCompleted => _isAnimationStopped;
+  
   // Seçilen parmağı ayarla
   static void setSelectedFinger(int finger) {
     if (_selectedFinger == null) {
@@ -34,40 +38,7 @@ class SelectionAnimation {
     _totalProgress = 0.0;
     _startTime = null; // Başlangıç zamanını sıfırla
     _lastUpdateTime = 0.0; // Son güncelleme zamanını sıfırla
-  }
-
-  // İterasyon bilgilerini hesapla
-  static Map<String, dynamic> _calculateIterationInfo(int currentIteration, double calculatedProgress, int totalFingers) {
-    final currentFingerNumber = (currentIteration % totalFingers) + 1;
-    final transitionText = _previousFingerNumber == -1 
-        ? "Başlangıç: $currentFingerNumber" 
-        : "$_previousFingerNumber ➔ $currentFingerNumber";
-    
-    // Sadece toplam iterasyon sayısına ulaşıldığında dur
-    final shouldStop = currentIteration >= GameScreen.kTotalIterations;
-    
-    return {
-      'currentFingerNumber': currentFingerNumber,
-      'transitionText': transitionText,
-      'shouldStop': shouldStop,
-    };
-  }
-
-  // Log mesajını yazdır
-  static void _printLog(int currentIteration, double calculatedProgress, String transitionText) {
-    final iterationText = currentIteration >= GameScreen.kTotalIterations 
-        ? '${currentIteration + 1}+' 
-        : '${currentIteration + 1}';
-    
-    final elapsedMs = _startTime != null 
-        ? DateTime.now().difference(_startTime!).inMilliseconds 
-        : 0;
-    
-    print('İterasyon: $iterationText/${GameScreen.kTotalIterations} | '
-          'İlerleme: ${calculatedProgress.toStringAsFixed(1)}% | '
-          'Geçiş: $transitionText | '
-          '🎯 Kazanan: $_selectedFinger | '
-          'Geçen: ${elapsedMs}ms');
+    _isAnimationStopped = false; // Animasyon durma flag'ini resetle
   }
 
   // İlk log mesajını yazdır
@@ -88,18 +59,10 @@ class SelectionAnimation {
   }) {
     final baseOpacity = GameScreen.kDarkenedOpacity;
     
-    // Mevcut iterasyonu hesapla
-    final currentIteration = (_totalProgress * GameScreen.kTotalIterations).floor();
-    
-    // İlerleme hızını hesapla (0-1 arasında)
-    double speedMultiplier;
-    if (currentIteration >= GameScreen.kTotalIterations) {
-      // Son aşamada çok yavaş ilerleme
-      speedMultiplier = 0.0001;
-    } else {
-      // Başlangıçta hızlı, sonra yavaşlayan ilerleme
-      final progressRatio = _totalProgress / 1.0;
-      speedMultiplier = (1.0 - (progressRatio * 0.9)).clamp(GameScreen.kSpeedMultiplierMin, GameScreen.kSpeedMultiplierMax);
+    // Başlangıçta initial log yaz
+    if (_isFirstLog) {
+      _printInitialLog();
+      _isFirstLog = false;
     }
     
     // Zaman bazlı ilerleme güncellemesi
@@ -110,41 +73,96 @@ class SelectionAnimation {
       final deltaTime = currentTime - _lastUpdateTime;
       _lastUpdateTime = currentTime;
       
-      // İlerlemeyi güncelle - daha yavaş ilerleme için çarpanı azalttık
-      _totalProgress = (_totalProgress + (deltaTime * GameScreen.kProgressDeltaTime * speedMultiplier)).clamp(0.0, 1.0);
-    }
-    
-    // İlerleme değerini hesapla (0-100 arasında)
-    final calculatedProgress = (_totalProgress * 100).clamp(0.0, 100.0);
-    
-    // Sadece ilk log veya parmak değiştiğinde log yazdır
-    if (_isFirstLog || currentIteration != _lastLoggedFinger) {
-      _printInitialLog();
-
-      final info = _calculateIterationInfo(currentIteration, calculatedProgress, totalFingers);
-      
-      if (!info['shouldStop']) {
-        _printLog(currentIteration, calculatedProgress, info['transitionText']);
+      // İlerlemeyi DAHA HIZLI güncelle - 3x hızlandırılmış (sabit hız)
+      if (!_isAnimationStopped) {
+        final oldProgress = _totalProgress;
+        _totalProgress += deltaTime * 3.0;
         
-        _lastLoggedFinger = currentIteration;
-        _previousFingerNumber = info['currentFingerNumber'];
-        _isFirstLog = false;
+        // Progress'i her 25% artışında loglayalım
+        if ((_totalProgress * 4).floor() > (oldProgress * 4).floor()) {
+          final iterCount = (_totalProgress * totalFingers).floor();
+          final fingerNum = (iterCount % totalFingers) + 1;
+          print('📈 Progress update: ${_totalProgress.toStringAsFixed(2)} | Iter: $iterCount | Finger: $fingerNum');
+        }
       }
     }
-
-    // Parmakları sırayla göster
+    
+    // Mevcut iterasyonu hesapla (kaçıncı parmaktayız)
+    final currentIteration = (_totalProgress * totalFingers).floor(); 
     final currentFingerNumber = (currentIteration % totalFingers) + 1;
-    final isLit = currentIteration >= GameScreen.kTotalIterations
-        ? fingerIndex == (_selectedFinger! - 1) // Kazanan parmağı göster
-        : currentIteration % totalFingers == fingerIndex;
+    
+    // Minimum iterasyon tamamlandı mı kontrol et
+    // 1 tur = totalFingers adımsayısı
+    final completedFullTurns = currentIteration ~/ totalFingers;
+    final minimumIterationsCompleted = completedFullTurns >= GameScreen.kTotalIterations;
+    
+    // Parmak değiştiğinde log yazdır
+    if (currentIteration != _lastLoggedFinger) {
+      final transitionText = _previousFingerNumber == -1 
+          ? "Başlangıç: $currentFingerNumber" 
+          : "$_previousFingerNumber ➔ $currentFingerNumber";
+      
+      // Son Tur Kuralı: Seçilen parmağa gelinmiş mi?
+      final isOnSelectedFinger = _selectedFinger != null && currentFingerNumber == _selectedFinger;
+      
+      // Duruş koşulları: Minimum iterasyonlar tamamlanmış VE son turda kazanan parmağa gelinmiş olmalı
+      final shouldStop = minimumIterationsCompleted && isOnSelectedFinger;
+      
+      // Detaylı durum bilgisi loglayalım
+      print('▶️ F${currentFingerNumber} | Iter: $currentIteration | '
+            'Tur: ${completedFullTurns + 1}/${GameScreen.kTotalIterations} | '
+            'Progress: ${(_totalProgress * 100).toStringAsFixed(1)}% | '
+            'MinIter: $minimumIterationsCompleted | OnWinner: $isOnSelectedFinger | '
+            'ShouldStop: $shouldStop | Target: $_selectedFinger');
+      
+      if (shouldStop) {
+        // Animasyonu durdur, kazanan parmağı göster
+        print('🏆 DURUŞ: Kazanan Parmak: $_selectedFinger | Tur: ${completedFullTurns + 1}');
+        _lastLoggedFinger = currentIteration;
+        _previousFingerNumber = currentFingerNumber;
+        
+        // Bu kritik! Animasyonu tamamen durduruyoruz
+        _isAnimationStopped = true;
+        print('🛑 Animation stopped: _isAnimationStopped set to true');
+      } else {
+        // Devam et, normal log yazdır
+        print('🔄 İterasyon: ${currentIteration + 1} | '
+              'Geçiş: $transitionText | '
+              'Tur: ${completedFullTurns + 1}/${GameScreen.kTotalIterations} | '
+              '🎯 Kazanan: $_selectedFinger');
+        
+        _lastLoggedFinger = currentIteration;
+        _previousFingerNumber = currentFingerNumber;
+      }
+    }
+    
+    // İstenilen parmak mı gösteriliyor?
+    bool isLit;
+    if (_isAnimationStopped) {
+      // Animasyon durdu, sadece kazanan parmağı göster
+      isLit = fingerIndex == (_selectedFinger! - 1);
+    } else {
+      // Normal sırayla parmakları göster
+      isLit = currentIteration % totalFingers == fingerIndex;
+    }
+    
+    // Debug - hangi parmağın gösterildiğini logla
+    // İlk kez gösterilen parmak değiştiğinde logla
+    if (isLit && (fingerIndex + 1) != _previousFingerNumber) {
+      print('HIGHLIGHT - Gösterilen Parmak: ${fingerIndex + 1} | Progress: ${_totalProgress.toStringAsFixed(2)}');
+    }
 
     return _buildAnimatedFinger(color, baseScale, isLit, baseOpacity, fingerNumber);
   }
 
   // Animasyonlu parmak widget'ını oluştur
   static Widget _buildAnimatedFinger(Color color, double baseScale, bool isLit, double baseOpacity, int fingerNumber) {
+    // Eğer tamamen durduysa ve seçilen parmak varsa, sadece kazanan parmağa özel efekt ver
+    final bool isSelected = _isAnimationStopped && isLit && _selectedFinger != null;
+    
+    // Kazanan parmağa daha parlak bir görünüm ver
     final borderOpacity = isLit 
-        ? GameScreen.kBorderOpacity 
+        ? (isSelected ? 0.8 : GameScreen.kBorderOpacity)  // Kazanan parmak daha parlak 
         : (GameScreen.kBorderOpacity * 0.3).clamp(0.0, GameScreen.kBorderOpacity);
 
     return FingerCircle(
@@ -156,3 +174,4 @@ class SelectionAnimation {
     );
   }
 }
+

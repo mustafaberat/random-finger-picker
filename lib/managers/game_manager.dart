@@ -98,14 +98,22 @@ class GameManager {
     }
     
     isSelecting = true;
-    currentFingerIndex = 0;
     
+    // SelectionAnimation'ı önce resetle
+    SelectionAnimation.resetSelectedFinger();
+    
+    // Rastgele parmak seç
     final fingerKeys = fingers.keys.toList();
-    // Randomly select a finger
     final random = Random();
     selectedFinger = fingerKeys[random.nextInt(fingerKeys.length)];
+    
+    // Seçilen parmağı ayarla
     SelectionAnimation.setSelectedFinger(selectedFinger!);
-    print('Manager choose winner finger: $selectedFinger');
+    
+    // Seçilen parmağın index'ini bul
+    currentFingerIndex = fingerKeys.indexOf(selectedFinger!);
+    
+    print('Manager choose winner finger: $selectedFinger (index: $currentFingerIndex)');
     
     _cycleFingers();
     onStartSelection();
@@ -118,28 +126,24 @@ class GameManager {
     }
     
     _selectionTimer?.cancel();
-    _selectionTimer = Timer.periodic(const Duration(milliseconds: 200), (timer) {
+    
+    // Timer'ı başlat - her 100ms'de bir kontrol et
+    _selectionTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       if (!isSelecting || fingers.length < 2) {
         timer.cancel();
         return;
       }
       
-      currentFingerIndex = (currentFingerIndex + 1) % fingers.length;
-      onStartSelection();
-    });
-
-    Future.delayed(const Duration(milliseconds: 2000), () {
-      _selectionTimer?.cancel();
-      if (isSelecting && fingers.length >= 2) {
-        final fingerKeys = fingers.keys.toList();
-        selectedFinger = SelectionAnimation.selectedFinger;
-        if (fingerKeys.contains(selectedFinger)) {
-          currentFingerIndex = fingerKeys.indexOf(selectedFinger!);
-          onStartSelection();
-          finishSelection();
-        } else {
-          reset();
-        }
+      // SelectionAnimation'dan seçilen parmağı al
+      selectedFinger = SelectionAnimation.selectedFinger;
+      if (selectedFinger == null) return;  // Henüz seçilen parmak yoksa geri dön
+      
+      // Animasyonun bitip bitmediğini kontrol et
+      if (SelectionAnimation.isAnimationCompleted) {
+        timer.cancel();
+        print("⭐ GameManager: Animation completed, calling finishSelection");
+        finishSelection();
+        return;
       }
     });
   }

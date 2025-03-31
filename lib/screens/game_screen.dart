@@ -51,10 +51,7 @@ class GameScreen extends StatefulWidget {
   static const double kGlowOpacity = 0.3;
   
   // Selection animation properties
-  static const Duration kSelectionInterval = Duration(milliseconds: 200);
-  static const Duration kSelectionDuration = Duration(milliseconds: 2000);
-  static const int kTotalIterations = 20000;
-  static const double kInitialPause = 0.2;
+  static const int kTotalIterations = 2;
   static const double kSpeedMultiplierMin = 0.1;
   static const double kSpeedMultiplierMax = 1.0;
   static const double kProgressDeltaTime = 0.5;
@@ -65,6 +62,7 @@ class GameScreen extends StatefulWidget {
   static const double kTapShrinkPhase = 0.3; // 70-100% of animation
   
   // Winner animation properties
+  static const double kInitialPause = 0.2;
   static const Duration kWinDuration = Duration(milliseconds: 4000);
   static const Duration kPulseDuration = Duration(milliseconds: 1000);
   static const Duration kConfettiDuration = Duration(seconds: 5);
@@ -145,16 +143,31 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     setState(() {
       _isInteractionEnabled = false;
     });
+    
+    // SelectionAnimation sınıfını resetleyelim
+    SelectionAnimation.resetSelectedFinger();
+    // Sonra kazanan parmağı ayarlayalım
+    SelectionAnimation.setSelectedFinger(_gameManager.selectedFinger!);
+    
     _animationManager.startSelectionAnimation();
   }
 
   void _onFinishSelection() {
-    setState(() {});
-    _animationManager.startWinAnimation();
-    _confettiController.play();
+    print("🎊 Finish selection - Starting win animation for finger: ${_gameManager.selectedFinger}");
+    setState(() {
+      // Kazanan parmak UI'da güncellendi
+    });
+    
+    // Win animasyonu için biraz bekleyelim
+    Future.delayed(Duration(milliseconds: 100), () {
+      _animationManager.startWinAnimation();
+      _confettiController.play();
+      print("🎉 Win animation started for finger: ${_gameManager.selectedFinger}");
+    });
   }
 
   void _onSelectionComplete() {
+    print("🌟 Selection completed - Winning finger: ${_gameManager.selectedFinger}");
     _gameManager.finishSelection();
   }
 
@@ -255,7 +268,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                                   selectionProgress: _animationManager.selectionController.value,
                                   fingerIndex: fingerIndex,
                                   totalFingers: _gameManager.fingers.length,
-                                  fingerNumber: entry.key,
+                                  fingerNumber: fingerIndex + 1,
                                 );
                               }
 

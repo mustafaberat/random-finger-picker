@@ -9,7 +9,6 @@ class AnimationManager {
   final Map<int, AnimationController> fingerAnimationControllers = {};
   late final AnimationController selectionController;
   late final AnimationController winAnimationController;
-  late final AnimationController speedController;
   bool _isWaitingForWinAnimation = false;
 
   final TickerProvider vsync;
@@ -25,7 +24,7 @@ class AnimationManager {
   void _initializeControllers() {
     selectionController = AnimationController(
       vsync: vsync,
-      duration: Duration(milliseconds: 200),
+      duration: Duration(milliseconds: 150), // Sabit, hızlı bir süre
     );
 
     winAnimationController = AnimationController(
@@ -33,32 +32,11 @@ class AnimationManager {
       duration: WinnerAnimation.duration,
     );
 
-    speedController = AnimationController(
-      vsync: vsync,
-      duration: Duration(milliseconds: 200),
-    );
-
     selectionController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        if (selectionController.value >= 1.0) {
-          onSelectionComplete();
-          startWinAnimation();
-        } else {
-          _animateNextSelection();
-        }
-      }
-    });
-
-    // Create a curved animation for speed
-    speedController.addListener(() {
-      // Speed up in the first half, slow down in the second half
-      if (speedController.value <= 0.5) {
-        // Accelerate: 200ms -> 50ms interval
-        selectionController.duration = Duration(milliseconds: (200 - (150 * (speedController.value * 2))).round());
-      } else {
-        // Decelerate: 50ms -> 300ms interval
-        final slowDownValue = (speedController.value - 0.5) * 2;
-        selectionController.duration = Duration(milliseconds: (50 + (250 * slowDownValue)).round());
+        // Animasyon tamamlandığında tekrar çağrılmaya devam edecek
+        // Bu _animateNextSelection içinde handling edilecek
+        print("👉 Selection animation cycle completed");
       }
     });
   }
@@ -66,7 +44,6 @@ class AnimationManager {
   void dispose() {
     selectionController.dispose();
     winAnimationController.dispose();
-    speedController.dispose();
     for (var controller in fingerAnimationControllers.values) {
       controller.dispose();
     }
@@ -102,36 +79,43 @@ class AnimationManager {
     }
     
     selectionController.stop();
-    speedController.stop();
     
-    // Start the speed controller which will drive the selection speed
-    speedController.forward(from: 0);
+    // Kesintisiz seleksiyon için timer kuralım
+    print("💫 Starting continuous selection animation");
+    
+    // Seçim animasyonunu sürekli çalıştır
     _animateNextSelection();
   }
 
   void _animateNextSelection() {
-    if (!selectionController.isAnimating) {
-      selectionController.forward(from: 0).whenComplete(() {
-        if (speedController.isAnimating) {
-          _animateNextSelection();
-        }
-      });
+    if (SelectionAnimation.isAnimationCompleted) {
+      print("✅ AnimationManager: Animation fully completed, calling onSelectionComplete");
+      onSelectionComplete();
+      return;
     }
+    
+    // Forward hareketi tamamlandığında, tekrar çağır
+    selectionController.forward(from: 0).whenComplete(() {
+      // Seçim animasyonu tamamlanmadığı sürece devam et
+      if (!SelectionAnimation.isAnimationCompleted) {
+        _animateNextSelection();
+      } else {
+        print("✅ AnimationManager: Animation fully completed (post-cycle), calling onSelectionComplete");
+        onSelectionComplete();
+      }
+    });
   }
 
   void startWinAnimation() {
     selectionController.stop();
-    speedController.stop();
     winAnimationController.forward(from: 0);
   }
 
   void reset() {
     selectionController.stop();
     winAnimationController.stop();
-    speedController.stop();
     selectionController.value = 0;
     winAnimationController.value = 0;
-    speedController.value = 0;
 
     if (GameScreen.kDebugMode) {
       // Keep only debug finger animations (1-4)
