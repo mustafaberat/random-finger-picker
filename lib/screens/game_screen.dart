@@ -32,7 +32,7 @@ class GameScreen extends StatefulWidget {
   ];
   
   // Game timing
-  static const int kInitialCountdown = 5;
+  static const int kInitialCountdown = 1; //TODO: default 5, debug icin 2 yaptim
   static const Duration kWinnerShowDuration = Duration(milliseconds: 3000);
   static const Duration kGameResetDelay = Duration(seconds: 3);
   
@@ -82,11 +82,6 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
-  // Oyun süreleri
-  static const int kInitialCountdown = 2; // Geri sayım süresi (saniye)
-  static const Duration kWinnerShowDuration = Duration(milliseconds: 3000); // Yenen rengi gösterme süresi
-  static const Duration kGameResetDelay = Duration(seconds: 1); // Oyunu sıfırlama gecikmesi
-
   // Animasyon süreleri
   static const Duration kSelectionAnimationDuration = SelectionAnimation.duration;
   static const Duration kFingerTapAnimationDuration = FingerTapAnimation.duration;
@@ -101,7 +96,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _confettiController = ConfettiController(duration: const Duration(seconds: 5));
+    _confettiController = ConfettiController(duration: GameScreen.kConfettiDuration);
     
     _animationManager = AnimationManager(
       vsync: this,
