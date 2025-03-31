@@ -42,9 +42,6 @@ class GameConstants {
 
   // Selection animation properties
   static const int kTotalIterations = 15;
-  static const double kSpeedMultiplierMin = 0.1;
-  static const double kSpeedMultiplierMax = 1.0;
-  static const double kProgressDeltaTime = 0.5;
   static const double kSelectedFingerBorderOpacity = 0.9;
   static const double kUnselectedFingerBorderOpacity = 0.15;
   static const double kStopDelayDuration = 500;
