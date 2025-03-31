@@ -51,7 +51,7 @@ class GameScreen extends StatefulWidget {
   static const double kGlowOpacity = 0.3;
   
   // Selection animation properties
-  static const int kTotalIterations = 2;
+  static const int kTotalIterations = 20;
   static const double kSpeedMultiplierMin = 0.1;
   static const double kSpeedMultiplierMax = 1.0;
   static const double kProgressDeltaTime = 0.5;

@@ -13,6 +13,11 @@ class SelectionAnimation {
   static DateTime? _startTime; // Animasyon başlangıç zamanını takip etmek için
   static double _lastUpdateTime = 0.0; // Son güncelleme zamanını takip etmek için
   
+  // Yeni değişkenler - hız kontrolü için
+  static const double _initialSpeed = 6.0; // Başlangıç hızı (daha hızlı)
+  static const double _finalSpeed = 0.3; // Son hız (daha yavaş)
+  static double _currentSpeed = _initialSpeed; // Mevcut hız
+  
   // Seçilen parmağı dışarıdan erişilebilir yap
   static int? get selectedFinger => _selectedFinger;
   
@@ -25,6 +30,7 @@ class SelectionAnimation {
     if (_selectedFinger == null) {
       _selectedFinger = finger;
       _startTime = DateTime.now(); // Animasyon başlangıç zamanını kaydet
+      _currentSpeed = _initialSpeed; // Başlangıç hızını ayarla
       print('Seçilen Parmak: $finger');
     }
   }
@@ -39,12 +45,34 @@ class SelectionAnimation {
     _startTime = null; // Başlangıç zamanını sıfırla
     _lastUpdateTime = 0.0; // Son güncelleme zamanını sıfırla
     _isAnimationStopped = false; // Animasyon durma flag'ini resetle
+    _currentSpeed = _initialSpeed; // Hızı sıfırla
   }
 
   // İlk log mesajını yazdır
   static void _printInitialLog() {
     if (_isFirstLog && _selectedFinger != null) {
       print('🎯 Seçilen Parmak: $_selectedFinger');
+    }
+  }
+
+  // Hız değerini güncelle - iterasyon ilerledikçe yavaşlama
+  static void _updateSpeed(int currentIteration, int totalFingers) {
+    // Toplam beklenen iterasyon sayısı
+    final totalExpectedIterations = totalFingers * GameScreen.kTotalIterations;
+    
+    // İterasyonun tamamlanma yüzdesi (0.0 - 1.0 arası)
+    final progressPercentage = min(1.0, currentIteration / totalExpectedIterations);
+    
+    // Daha dramatik bir yavaşlama için geliştirilmiş easing fonksiyonu
+    // Cubic easing out - yavaşça başlar, sonra hızlanır ve sona doğru yavaşlar
+    final easeFactor = 1.0 - pow(progressPercentage, 4).toDouble();
+    
+    // Hızı hesapla - başlangıçta hızlı, sona doğru çok yavaş
+    _currentSpeed = _initialSpeed * easeFactor + _finalSpeed;
+    
+    // Debug log - her 5 iteration'da bir hız bilgisini logla
+    if (currentIteration % 5 == 0) {
+      print('🏃‍♂️ Speed update: ${_currentSpeed.toStringAsFixed(2)} | Progress: ${(progressPercentage * 100).toStringAsFixed(1)}%');
     }
   }
 
@@ -73,16 +101,16 @@ class SelectionAnimation {
       final deltaTime = currentTime - _lastUpdateTime;
       _lastUpdateTime = currentTime;
       
-      // İlerlemeyi DAHA HIZLI güncelle - 3x hızlandırılmış (sabit hız)
+      // Dinamik hızla ilerlemeyi güncelle
       if (!_isAnimationStopped) {
         final oldProgress = _totalProgress;
-        _totalProgress += deltaTime * 3.0;
+        _totalProgress += deltaTime * _currentSpeed;
         
         // Progress'i her 25% artışında loglayalım
         if ((_totalProgress * 4).floor() > (oldProgress * 4).floor()) {
           final iterCount = (_totalProgress * totalFingers).floor();
           final fingerNum = (iterCount % totalFingers) + 1;
-          print('📈 Progress update: ${_totalProgress.toStringAsFixed(2)} | Iter: $iterCount | Finger: $fingerNum');
+          print('📈 Progress update: ${_totalProgress.toStringAsFixed(2)} | Iter: $iterCount | Finger: $fingerNum | Speed: ${_currentSpeed.toStringAsFixed(2)}');
         }
       }
     }
@@ -90,6 +118,11 @@ class SelectionAnimation {
     // Mevcut iterasyonu hesapla (kaçıncı parmaktayız)
     final currentIteration = (_totalProgress * totalFingers).floor(); 
     final currentFingerNumber = (currentIteration % totalFingers) + 1;
+    
+    // Her iterasyonda hızı güncelle
+    if (!_isAnimationStopped && currentIteration != _lastLoggedFinger) {
+      _updateSpeed(currentIteration, totalFingers);
+    }
     
     // Minimum iterasyon tamamlandı mı kontrol et
     // 1 tur = totalFingers adımsayısı
@@ -112,6 +145,7 @@ class SelectionAnimation {
       print('▶️ F${currentFingerNumber} | Iter: $currentIteration | '
             'Tur: ${completedFullTurns + 1}/${GameScreen.kTotalIterations} | '
             'Progress: ${(_totalProgress * 100).toStringAsFixed(1)}% | '
+            'Speed: ${_currentSpeed.toStringAsFixed(2)} | '
             'MinIter: $minimumIterationsCompleted | OnWinner: $isOnSelectedFinger | '
             'ShouldStop: $shouldStop | Target: $_selectedFinger');
       
@@ -129,7 +163,8 @@ class SelectionAnimation {
         print('🔄 İterasyon: ${currentIteration + 1} | '
               'Geçiş: $transitionText | '
               'Tur: ${completedFullTurns + 1}/${GameScreen.kTotalIterations} | '
-              '🎯 Kazanan: $_selectedFinger');
+              '🎯 Kazanan: $_selectedFinger | '
+              '⚡ Hız: ${_currentSpeed.toStringAsFixed(2)}');
         
         _lastLoggedFinger = currentIteration;
         _previousFingerNumber = currentFingerNumber;
@@ -149,7 +184,7 @@ class SelectionAnimation {
     // Debug - hangi parmağın gösterildiğini logla
     // İlk kez gösterilen parmak değiştiğinde logla
     if (isLit && (fingerIndex + 1) != _previousFingerNumber) {
-      print('HIGHLIGHT - Gösterilen Parmak: ${fingerIndex + 1} | Progress: ${_totalProgress.toStringAsFixed(2)}');
+      print('HIGHLIGHT - Gösterilen Parmak: ${fingerIndex + 1} | Progress: ${_totalProgress.toStringAsFixed(2)} | Speed: ${_currentSpeed.toStringAsFixed(2)}');
     }
 
     return _buildAnimatedFinger(color, baseScale, isLit, baseOpacity, fingerNumber);
