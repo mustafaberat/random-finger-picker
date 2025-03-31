@@ -22,13 +22,13 @@ class GameConstants {
   ];
 
   // Game timing
-  static const int kInitialCountdown = false ? 1 : 5;
+  static const int kInitialCountdown = kDebugMode ? 1 : 5;
   static const Duration kWinnerShowDuration = Duration(milliseconds: 3000);
   static const Duration kGameResetDelay = Duration(seconds: 3);
 
   // Common animation properties
-  static const double kMaxScale = 1.6;
-  static const double kFinalScale = 1.2;
+  static const double kMaxScale = 1.4;
+  static const double kFinalScale = 1.0;
   static const double kPulseScaleFactor = 0.3;
   static const double kBorderWidth = 3.0;
   static const double kOuterBorderWidth = 4.0;
@@ -64,4 +64,4 @@ class GameConstants {
 
   // Debug mode
   static const bool kDebugMode = false;
-} 
+}
