@@ -242,7 +242,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                               if (_gameManager.isSelecting) {
                                 return SelectionAnimation.build(
                                   color: fingerColor,
-                                  scale: baseScale,
+                                  baseScale: baseScale,
                                   isSelected: isSelected,
                                   selectionProgress: _animationManager.selectionController.value,
                                   fingerIndex: fingerIndex,
@@ -255,7 +255,6 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                                 opacity: opacity,
                                 child: FingerTapAnimation.build(
                                   color: fingerColor,
-                                  scale: baseScale,
                                   tapProgress: tapProgress,
                                   isSelecting: _gameManager.isSelecting,
                                   isWinAnimationPlaying: _gameManager.isWinAnimationPlaying,

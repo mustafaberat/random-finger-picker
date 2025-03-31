@@ -70,7 +70,7 @@ class SelectionAnimation {
 
   static Widget build({
     required Color color,
-    required double scale,
+    required double baseScale,
     required bool isSelected,
     required double selectionProgress,
     required int fingerIndex,
@@ -113,18 +113,18 @@ class SelectionAnimation {
         ? fingerIndex == (_selectedFinger! - 1) // Kazanan parmağı göster
         : currentIteration % totalFingers == fingerIndex;
 
-    return _buildAnimatedFinger(color, scale, isLit, baseOpacity, fingerNumber);
+    return _buildAnimatedFinger(color, baseScale, isLit, baseOpacity, fingerNumber);
   }
 
   // Animasyonlu parmak widget'ını oluştur
-  static Widget _buildAnimatedFinger(Color color, double scale, bool isLit, double baseOpacity, int fingerNumber) {
+  static Widget _buildAnimatedFinger(Color color, double baseScale, bool isLit, double baseOpacity, int fingerNumber) {
     final borderOpacity = isLit 
         ? GameScreen.kBorderOpacity 
         : (GameScreen.kBorderOpacity * 0.3).clamp(0.0, GameScreen.kBorderOpacity);
 
     return FingerCircle(
       color: color,
-      scale: scale,
+      baseScale: baseScale,
       fingerNumber: fingerNumber,
       borderOpacity: borderOpacity,
       isLit: isLit,

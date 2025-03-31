@@ -2,29 +2,60 @@ import 'package:flutter/material.dart';
 import '../screens/game_screen.dart';
 
 class FingerCircle extends StatelessWidget {
+  static const double kFontSizeRatio = 0.9;
+
   final Color color;
-  final double scale;
   final int fingerNumber;
   final double borderOpacity;
   final bool showOuterCircle;
   final bool isLit;
-  final double? customFontSize;
+  
+  // Animasyon parametreleri
+  final double? tapProgress;
+  final double? baseScale;
 
   const FingerCircle({
     super.key,
     required this.color,
-    required this.scale,
     required this.fingerNumber,
     this.borderOpacity = 1.0,
     this.showOuterCircle = true,
     this.isLit = true,
-    this.customFontSize,
+    this.tapProgress,
+    this.baseScale,
   });
+
+  double _calculateScale() {
+    if (tapProgress != null) {
+      // FingerTapAnimation mantığı
+      final maxScale = GameScreen.kMaxScale;
+      final finalRestScale = GameScreen.kFinalScale;
+      final clampedProgress = tapProgress!.clamp(0.0, 1.0);
+      
+      if (clampedProgress < 0.7) {
+        // First phase: Expand (0-70% of animation)
+        final expandProgress = (clampedProgress / 0.7).clamp(0.0, 1.0);
+        return 1.0 + ((maxScale - 1.0) * Curves.easeOut.transform(expandProgress));
+      } else {
+        // Second phase: Shrink (70-100% of animation)
+        final shrinkProgress = ((clampedProgress - 0.7) / 0.3).clamp(0.0, 1.0);
+        return maxScale - ((maxScale - finalRestScale) * Curves.easeInOut.transform(shrinkProgress));
+      }
+    } else if (baseScale != null) {
+      // WinnerAnimation mantığı
+      return baseScale!;
+    }
+    
+    // Default scale
+    return 1.0;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final currentScale = _calculateScale();
+
     return Transform.scale(
-      scale: scale,
+      scale: currentScale,
       child: Stack(
         alignment: Alignment.center,
         children: [
@@ -69,14 +100,14 @@ class FingerCircle extends StatelessWidget {
         child: FittedBox(
           fit: BoxFit.scaleDown,
           child: Container(
-            width: GameScreen.kFingerSize * 0.8,
-            height: GameScreen.kFingerSize * 0.8,
+            width: GameScreen.kFingerSize ,
+            height: GameScreen.kFingerSize,
             alignment: Alignment.center,
             child: Text(
               fingerNumber.toString(),
               style: TextStyle(
                 color: Colors.white,
-                fontSize: customFontSize ?? (GameScreen.kFingerSize * 0.9),
+                fontSize: GameScreen.kFingerSize * kFontSizeRatio,
                 fontFamily: GameScreen.kFontFamily,
                 fontWeight: FontWeight.bold,
                 shadows: const [

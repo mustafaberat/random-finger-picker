@@ -50,8 +50,8 @@ class WinnerAnimation extends StatelessWidget {
       children: [
         FingerCircle(
           color: color,
-          scale: currentScale,
           fingerNumber: fingerNumber,
+          baseScale: currentScale,
         ),
 
         // Konfeti
