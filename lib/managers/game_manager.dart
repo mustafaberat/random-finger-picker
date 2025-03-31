@@ -69,6 +69,12 @@ class GameManager {
     
     if (fingerEntry.key == -1) return;
     
+    // Store the original mappings of position to color before removing
+    final Map<Offset, Color> positionToColorMap = {};
+    for (var entry in fingers.entries) {
+      positionToColorMap[entry.value] = fingerColors[entry.key]!;
+    }
+    
     fingers.remove(fingerEntry.key);
     fingerColors.remove(fingerEntry.key);
     
@@ -80,8 +86,8 @@ class GameManager {
     int newKey = 1;
     for (var entry in remainingFingers.entries) {
       fingers[newKey] = entry.value;
-      // Assign color based on the new key number
-      fingerColors[newKey] = GameConstants.kGameColors[(newKey - 1) % GameConstants.kGameColors.length];
+      // Use the original color associated with this position
+      fingerColors[newKey] = positionToColorMap[entry.value]!;
       newKey++;
     }
     
