@@ -4,13 +4,15 @@ import '../screens/game_screen.dart';
 import '../components/finger_circle.dart';
 
 class SelectionAnimation {
-  static const int totalIterations = 100; // Toplam iterasyon sayısı
-  static const Duration duration = Duration(milliseconds: 2000); // Her iterasyon için süre
+  static const int totalIterations = 20000; // Toplam iterasyon sayısını artırdık
+  static const Duration duration = Duration(milliseconds: 0); // Dummy
   static int _lastLoggedFinger = -1; // Son loglanan parmağı takip etmek için
   static bool _isFirstLog = true; // İlk log için kontrol
   static double _totalProgress = 0.0; // Toplam ilerlemeyi takip etmek için
   static int? _selectedFinger; // Seçilen parmağı takip etmek için
   static int _previousFingerNumber = -1; // Önceki parmak numarasını takip etmek için
+  static DateTime? _startTime; // Animasyon başlangıç zamanını takip etmek için
+  static double _lastUpdateTime = 0.0; // Son güncelleme zamanını takip etmek için
   
   // Seçilen parmağı dışarıdan erişilebilir yap
   static int? get selectedFinger => _selectedFinger;
@@ -19,6 +21,7 @@ class SelectionAnimation {
   static void setSelectedFinger(int finger) {
     if (_selectedFinger == null) {
       _selectedFinger = finger;
+      _startTime = DateTime.now(); // Animasyon başlangıç zamanını kaydet
       print('Seçilen Parmak: $finger');
     }
   }
@@ -30,6 +33,8 @@ class SelectionAnimation {
     _lastLoggedFinger = -1;
     _previousFingerNumber = -1;
     _totalProgress = 0.0;
+    _startTime = null; // Başlangıç zamanını sıfırla
+    _lastUpdateTime = 0.0; // Son güncelleme zamanını sıfırla
   }
 
   // İterasyon bilgilerini hesapla
@@ -39,8 +44,8 @@ class SelectionAnimation {
         ? "Başlangıç: $currentFingerNumber" 
         : "$_previousFingerNumber ➔ $currentFingerNumber";
     
-    // 100 iterasyon sonrası kazanan parmağa ulaşıldığında durmalı
-    final shouldStop = currentIteration >= totalIterations && currentFingerNumber == _selectedFinger;
+    // Sadece toplam iterasyon sayısına ulaşıldığında dur
+    final shouldStop = currentIteration >= totalIterations;
     
     return {
       'currentFingerNumber': currentFingerNumber,
@@ -55,10 +60,15 @@ class SelectionAnimation {
         ? '${currentIteration + 1}+' 
         : '${currentIteration + 1}';
     
+    final elapsedMs = _startTime != null 
+        ? DateTime.now().difference(_startTime!).inMilliseconds 
+        : 0;
+    
     print('İterasyon: $iterationText/$totalIterations | '
           'İlerleme: ${calculatedProgress.toStringAsFixed(1)}% | '
           'Geçiş: $transitionText | '
-          '🎯 Kazanan: $_selectedFinger');
+          '🎯 Kazanan: $_selectedFinger | '
+          'Geçen: ${elapsedMs}ms');
   }
 
   // İlk log mesajını yazdır
@@ -82,11 +92,27 @@ class SelectionAnimation {
     // Mevcut iterasyonu hesapla
     final currentIteration = (_totalProgress * totalIterations).floor();
     
-    // Toplam ilerlemeyi güncelle (100 iterasyon sonrası yavaşlat)
+    // İlerleme hızını hesapla (0-1 arasında)
+    double speedMultiplier;
     if (currentIteration >= totalIterations) {
-      _totalProgress = (_totalProgress + (selectionProgress * 0.005)).clamp(0.0, 2.0); // Yavaşlatılmış ilerleme
+      // Son aşamada çok yavaş ilerleme
+      speedMultiplier = 0.0001;
     } else {
-      _totalProgress = (_totalProgress + (selectionProgress * 0.01)).clamp(0.0, 2.0);
+      // Başlangıçta hızlı, sonra yavaşlayan ilerleme
+      final progressRatio = _totalProgress / 1.0;
+      speedMultiplier = (1.0 - (progressRatio * 0.9)).clamp(0.1, 1.0);
+    }
+    
+    // Zaman bazlı ilerleme güncellemesi
+    final currentTime = DateTime.now().millisecondsSinceEpoch / 1000.0;
+    if (_lastUpdateTime == 0.0) {
+      _lastUpdateTime = currentTime;
+    } else {
+      final deltaTime = currentTime - _lastUpdateTime;
+      _lastUpdateTime = currentTime;
+      
+      // İlerlemeyi güncelle - daha yavaş ilerleme için çarpanı azalttık
+      _totalProgress = (_totalProgress + (deltaTime * 0.5 * speedMultiplier)).clamp(0.0, 1.0);
     }
     
     // İlerleme değerini hesapla (0-100 arasında)
@@ -107,7 +133,7 @@ class SelectionAnimation {
       }
     }
 
-    // Parmakları sırayla göster, 100 iterasyon sonrası kazanan parmağa gelene kadar devam et
+    // Parmakları sırayla göster
     final currentFingerNumber = (currentIteration % totalFingers) + 1;
     final isLit = currentIteration >= totalIterations
         ? fingerIndex == (_selectedFinger! - 1) // Kazanan parmağı göster
