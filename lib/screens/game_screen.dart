@@ -19,16 +19,16 @@ class GameScreen extends StatefulWidget {
 
   // Game colors
   static const List<Color> kGameColors = [
+    Colors.brown,
     Colors.red,
     Colors.blue,
     Colors.yellow,
+    Colors.teal,
     Colors.orange,
     Colors.purple,
     Colors.green,
     Colors.cyan,
-    Colors.teal,
     Colors.pink,
-    Colors.brown,
   ];
 
   // Game timing
@@ -44,8 +44,8 @@ class GameScreen extends StatefulWidget {
   static const double kOuterBorderWidth = 4.0;
   static const double kOuterBorderScale = 1.30;
   static const double kBorderOpacity = 0.4;
-  static const double kHighlightBorderOpacity = 0.8;
-  static const double kDarkenedOpacity = 0.5;
+  static const double kHighlightBorderOpacity = 0.9;
+  static const double kDarkenedOpacity = 0.2;
   static const double kGlowBlurRadius = 10.0;
   static const double kGlowSpreadRadius = 5.0;
   static const double kGlowOpacity = 0.3;

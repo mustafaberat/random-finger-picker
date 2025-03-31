@@ -9,7 +9,7 @@ class FingerCircle extends StatelessWidget {
   final double borderOpacity;
   final bool showOuterCircle;
   final bool isLit;
-  
+
   // Animasyon parametreleri
   final double? tapProgress;
   final double? baseScale;
@@ -31,21 +31,27 @@ class FingerCircle extends StatelessWidget {
       final maxScale = GameScreen.kMaxScale;
       final finalRestScale = GameScreen.kFinalScale;
       final clampedProgress = tapProgress!.clamp(0.0, 1.0);
-      
+
       if (clampedProgress < GameScreen.kTapExpandPhase) {
         // First phase: Expand (0-70% of animation)
-        final expandProgress = (clampedProgress / GameScreen.kTapExpandPhase).clamp(0.0, 1.0);
-        return 1.0 + ((maxScale - 1.0) * Curves.easeOut.transform(expandProgress));
+        final expandProgress =
+            (clampedProgress / GameScreen.kTapExpandPhase).clamp(0.0, 1.0);
+        return 1.0 +
+            ((maxScale - 1.0) * Curves.easeOut.transform(expandProgress));
       } else {
         // Second phase: Shrink (70-100% of animation)
-        final shrinkProgress = ((clampedProgress - GameScreen.kTapExpandPhase) / GameScreen.kTapShrinkPhase).clamp(0.0, 1.0);
-        return maxScale - ((maxScale - finalRestScale) * Curves.easeInOut.transform(shrinkProgress));
+        final shrinkProgress = ((clampedProgress - GameScreen.kTapExpandPhase) /
+                GameScreen.kTapShrinkPhase)
+            .clamp(0.0, 1.0);
+        return maxScale -
+            ((maxScale - finalRestScale) *
+                Curves.easeInOut.transform(shrinkProgress));
       }
     } else if (baseScale != null) {
       // WinnerAnimation mantığı
       return baseScale!;
     }
-    
+
     // Default scale
     return 1.0;
   }
@@ -90,7 +96,8 @@ class FingerCircle extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(GameScreen.kGlowOpacity * (isLit ? 0.7 : 0.3)),
+            color: color
+                .withOpacity(GameScreen.kGlowOpacity * (isLit ? 0.7 : 0.3)),
             blurRadius: GameScreen.kGlowBlurRadius,
             spreadRadius: GameScreen.kGlowSpreadRadius * 0.7,
           ),
@@ -106,7 +113,7 @@ class FingerCircle extends StatelessWidget {
             child: Text(
               fingerNumber.toString(),
               style: TextStyle(
-                color: Colors.white,
+                color: Colors.white.withOpacity(GameScreen.kHighlightBorderOpacity),
                 fontSize: GameScreen.kFingerSize * kFontSizeRatio,
                 fontFamily: GameScreen.kFontFamily,
                 fontWeight: FontWeight.bold,
@@ -125,4 +132,4 @@ class FingerCircle extends StatelessWidget {
       ),
     );
   }
-} 
+}

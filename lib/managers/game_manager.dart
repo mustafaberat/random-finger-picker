@@ -42,7 +42,9 @@ class GameManager {
       nextKey++;
     }
     
+    // Add the finger with the next available key
     fingers[nextKey] = position;
+    // Get color based on the finger number (1 should get red at index 0)
     fingerColors[nextKey] = _getNextColor();
     _resetWaitTimer();
   }
@@ -75,14 +77,14 @@ class GameManager {
     
     // Renumber remaining fingers starting from 1
     final remainingFingers = Map<int, Offset>.from(fingers);
-    final remainingColors = Map<int, Color>.from(fingerColors);
     fingers.clear();
     fingerColors.clear();
     
     int newKey = 1;
     for (var entry in remainingFingers.entries) {
       fingers[newKey] = entry.value;
-      fingerColors[newKey] = remainingColors[entry.key]!;
+      // Assign color based on the new key number
+      fingerColors[newKey] = GameScreen.kGameColors[(newKey - 1) % GameScreen.kGameColors.length];
       newKey++;
     }
     
@@ -212,14 +214,14 @@ class GameManager {
   }
 
   Color _getNextColor() {
-    // Get the next available number (which will be the index + 1)
+    // Find the next available number
     int nextKey = 1;
     while (fingers.containsKey(nextKey)) {
       nextKey++;
     }
     
-    // Use the index (nextKey - 1) to get the color from the array
-    // If we exceed the array length, wrap around using modulo
-    return GameScreen.kGameColors[(nextKey - 1) % GameScreen.kGameColors.length];
+    // Use nextKey directly as index (subtract 1 to convert from 1-based to 0-based indexing)
+    int colorIndex = (nextKey - 1) % GameScreen.kGameColors.length;
+    return GameScreen.kGameColors[colorIndex];
   }
 } 
