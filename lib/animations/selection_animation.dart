@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../screens/game_screen.dart';
+import '../components/finger_circle.dart';
 
 class SelectionAnimation {
   static const int totalIterations = 100; // Toplam iterasyon sayısı
@@ -121,68 +122,12 @@ class SelectionAnimation {
         ? GameScreen.kBorderOpacity 
         : (GameScreen.kBorderOpacity * 0.3).clamp(0.0, GameScreen.kBorderOpacity);
 
-    return Transform.scale(
+    return FingerCircle(
+      color: color,
       scale: scale,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          _buildOuterCircle(color, borderOpacity),
-          _buildMainCircle(color, isLit, baseOpacity, borderOpacity, fingerNumber),
-        ],
-      ),
-    );
-  }
-
-  // Dış çember widget'ını oluştur
-  static Widget _buildOuterCircle(Color color, double borderOpacity) {
-    return Container(
-      width: GameScreen.kFingerSize * GameScreen.kOuterBorderScale,
-      height: GameScreen.kFingerSize * GameScreen.kOuterBorderScale,
-      decoration: BoxDecoration(
-        color: color.withOpacity(borderOpacity * 0.3),
-        shape: BoxShape.circle,
-      ),
-    );
-  }
-
-  // Ana çember widget'ını oluştur
-  static Widget _buildMainCircle(Color color, bool isLit, double baseOpacity, double borderOpacity, int fingerNumber) {
-    return Container(
-      width: GameScreen.kFingerSize,
-      height: GameScreen.kFingerSize,
-      decoration: BoxDecoration(
-        color: isLit ? color : color.withOpacity(baseOpacity),
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: Colors.white.withOpacity(borderOpacity),
-          width: GameScreen.kBorderWidth,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: color.withOpacity(GameScreen.kGlowOpacity * (isLit ? 0.7 : 0.3)),
-            blurRadius: GameScreen.kGlowBlurRadius,
-            spreadRadius: GameScreen.kGlowSpreadRadius * (isLit ? 0.7 : 0.3),
-          ),
-        ],
-      ),
-      child: Center(
-        child: Text(
-          fingerNumber.toString(),
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: GameScreen.kFingerSize * 0.9,
-            fontFamily: GameScreen.kFontFamily,
-            fontWeight: FontWeight.bold,
-            shadows: [
-              Shadow(
-                color: Colors.black26,
-                blurRadius: 2,
-                offset: Offset(1, 1),
-              ),
-            ],
-          ),
-        ),
-      ),
+      fingerNumber: fingerNumber,
+      borderOpacity: borderOpacity,
+      isLit: isLit,
     );
   }
 }

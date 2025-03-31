@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../screens/game_screen.dart';
+import '../components/finger_circle.dart';
 
 class FingerTapAnimation {
   static const Duration duration = GameScreen.kTapDuration;
@@ -37,60 +38,11 @@ class FingerTapAnimation {
     final borderOpacity = (Curves.easeInOut.transform(borderProgress) * GameScreen.kBorderOpacity)
         .clamp(0.0, GameScreen.kBorderOpacity);
 
-    return Transform.scale(
+    return FingerCircle(
+      color: color,
       scale: scale * currentScale,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Outer border circle with smoother transition
-          Container(
-            width: GameScreen.kFingerSize * GameScreen.kOuterBorderScale,
-            height: GameScreen.kFingerSize * GameScreen.kOuterBorderScale,
-            decoration: BoxDecoration(
-              color: color.withOpacity(borderOpacity * 0.3),
-              shape: BoxShape.circle,
-            ),
-          ),
-          // Main circle with improved shadow
-          Container(
-            width: GameScreen.kFingerSize,
-            height: GameScreen.kFingerSize,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: Colors.white.withOpacity(borderOpacity),
-                width: GameScreen.kBorderWidth,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: color.withOpacity(GameScreen.kGlowOpacity * 0.7),
-                  blurRadius: GameScreen.kGlowBlurRadius,
-                  spreadRadius: GameScreen.kGlowSpreadRadius * 0.7,
-                ),
-              ],
-            ),
-            child: Center(
-              child: Text(
-                fingerNumber.toString(),
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: GameScreen.kFingerSize * 0.9,
-                  fontFamily: GameScreen.kFontFamily,
-                  fontWeight: FontWeight.bold,
-                  shadows: [
-                    Shadow(
-                      color: Colors.black26,
-                      blurRadius: 2,
-                      offset: Offset(1, 1),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+      fingerNumber: fingerNumber,
+      borderOpacity: borderOpacity,
     );
   }
 }

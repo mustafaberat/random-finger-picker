@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../screens/game_screen.dart';
+import '../components/finger_circle.dart';
 
 class WinnerAnimation extends StatelessWidget {
   static const Duration duration = GameScreen.kWinDuration;
@@ -43,95 +44,23 @@ class WinnerAnimation extends StatelessWidget {
   Widget build(BuildContext context) {
     final double delayedProgress = _calculateDelayedProgress(progress);
     final double currentScale = _calculateScale(baseScale, delayedProgress);
-    final double numberOpacity = _calculateNumberOpacity(delayedProgress);
     final double confettiProgress = _calculateConfettiProgress(progress);
 
-    return Container(
-      width: GameScreen.kFingerSize,
-      height: GameScreen.kFingerSize,
-      child: Stack(
-        fit: StackFit.loose,
-        children: [
-          // Dış border dairesi
-          Center(
-            child: AnimatedScale(
-              scale: currentScale,
-              duration: const Duration(milliseconds: 100),
-              child: Container(
-                width: GameScreen.kFingerSize * GameScreen.kOuterBorderScale,
-                height: GameScreen.kFingerSize * GameScreen.kOuterBorderScale,
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ),
-          ),
+    return Stack(
+      children: [
+        FingerCircle(
+          color: color,
+          scale: currentScale,
+          fingerNumber: fingerNumber,
+        ),
 
-          // Büyüyen daire
-          Center(
-            child: AnimatedScale(
-              scale: currentScale,
-              duration: const Duration(milliseconds: 100),
-              child: Container(
-                width: GameScreen.kFingerSize,
-                height: GameScreen.kFingerSize,
-                decoration: BoxDecoration(
-                  color: color,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.4),
-                    width: GameScreen.kBorderWidth,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: color.withOpacity(0.3),
-                      blurRadius: 30,
-                      spreadRadius: 15,
-                    ),
-                    BoxShadow(
-                      color: color.withOpacity(0.3),
-                      blurRadius: GameScreen.kGlowBlurRadius,
-                      spreadRadius: GameScreen.kGlowSpreadRadius * 0.7,
-                    ),
-                  ],
-                ),
-              ),
-            ),
+        // Konfeti
+        if (confettiProgress > 0)
+          CustomPaint(
+            size: MediaQuery.of(context).size,
+            painter: ConfettiPainter(progress: confettiProgress),
           ),
-
-          // Numara
-          Center(
-            child: AnimatedScale(
-              scale: currentScale * 0.7,
-              duration: const Duration(milliseconds: 100),
-                  child: Text(
-                    fingerNumber.toString(),
-                    style: TextStyle(
-                      color: Colors.white,
-                  fontSize: GameScreen.kFingerSize * 0.9,
-                      fontFamily: GameScreen.kFontFamily,
-                      fontWeight: FontWeight.bold,
-                      shadows: const [
-                        Shadow(
-                          color: Colors.black26,
-                          blurRadius: 4,
-                          offset: Offset(2, 2),
-                        ),
-                      ],
-                    ),
-              ),
-            ),
-          ),
-
-          // Konfeti
-          if (confettiProgress > 0)
-            CustomPaint(
-              size: MediaQuery.of(context).size,
-              painter: ConfettiPainter(progress: confettiProgress),
-            ),
-        ],
-      ),
+      ],
     );
   }
 
@@ -147,46 +76,55 @@ class WinnerAnimation extends StatelessWidget {
     return baseScale + (maxScale * progress);
   }
 
-  double _calculateNumberOpacity(double progress) {
-    return 1.0;
-  }
-
   double _calculateConfettiProgress(double progress) {
     return progress > 0.8 ? (progress - 0.8) * 5 : 0.0;
   }
 }
 
 class ConfettiPainter extends CustomPainter {
+  static const int confettiCount = 30;
   final double progress;
-
+  
+  // Cache confetti properties
+  static final List<_ConfettiParticle> _particles = _generateParticles();
+  
   ConfettiPainter({required this.progress});
+
+  static List<_ConfettiParticle> _generateParticles() {
+    final random = Random(42);
+    return List.generate(
+      confettiCount,
+      (i) => _ConfettiParticle(
+        angle: random.nextDouble() * 2 * pi,
+        color: HSLColor.fromAHSL(
+          1,
+          random.nextDouble() * 360,
+          0.8,
+          0.6,
+        ).toColor(),
+        isCircle: i % 3 == 0,
+        spreadX: random.nextDouble() - 0.5,
+        spreadY: random.nextDouble() - 0.5,
+      ),
+    );
+  }
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..style = PaintingStyle.fill
-      ..strokeWidth = 2;
-
-    final random = Random(42);
-    final confettiCount = 30;
-
-    for (var i = 0; i < confettiCount; i++) {
-      final x = size.width / 2 + (random.nextDouble() - 0.5) * size.width * progress;
-      final y = size.height / 2 + (random.nextDouble() - 0.5) * size.height * progress;
-      final rotation = random.nextDouble() * 2 * pi * progress;
-      final color = HSLColor.fromAHSL(
-        1,
-        random.nextDouble() * 360,
-        0.8,
-        0.6,
-      ).toColor();
-
-      paint.color = color;
+    final paint = Paint()..style = PaintingStyle.fill;
+    
+    for (final particle in _particles) {
+      final x = size.width / 2 + particle.spreadX * size.width * progress;
+      final y = size.height / 2 + particle.spreadY * size.height * progress;
+      final rotation = particle.angle * progress;
+      
+      paint.color = particle.color;
+      
       canvas.save();
       canvas.translate(x, y);
       canvas.rotate(rotation);
       
-      if (i % 3 == 0) {
+      if (particle.isCircle) {
         canvas.drawCircle(Offset.zero, 6, paint);
       } else {
         canvas.drawRect(
@@ -204,4 +142,20 @@ class ConfettiPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(ConfettiPainter oldDelegate) => progress != oldDelegate.progress;
+}
+
+class _ConfettiParticle {
+  final double angle;
+  final Color color;
+  final bool isCircle;
+  final double spreadX;
+  final double spreadY;
+
+  const _ConfettiParticle({
+    required this.angle,
+    required this.color,
+    required this.isCircle,
+    required this.spreadX,
+    required this.spreadY,
+  });
 }
