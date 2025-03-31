@@ -5,7 +5,7 @@ import '../screens/game_screen.dart';
 class WinnerAnimation {
   static const Duration duration = GameScreen.kWinDuration;
   static const int lucyFingerId = 1; // Lucy's finger ID for consistency
-  static bool _isFirstLog = true; // İlk log için kontrol
+  static bool _isFirstLog = true;
 
   static Widget build({
     required Color color,
@@ -13,114 +13,130 @@ class WinnerAnimation {
     required double baseScale,
     required int fingerNumber,
   }) {
-    // Log kazanan parmağı sadece bir kez
     if (_isFirstLog) {
-      print('🎊 Kazanan Animasyonu Başladı | Parmak: $fingerNumber');
+      debugPrint('🎊 Kazanan Animasyonu Başladı | Parmak: $fingerNumber');
       _isFirstLog = false;
     }
 
-    // Daha smooth timing için ayarlanmış değerler
-    final initialPause = 0.4; // Daha kısa başlangıç duraklaması
-    final glowDuration = 0.7; // Daha kısa glow fazı
-    
-    // Daha yumuşak progress hesaplaması
-    final delayedProgress = progress < initialPause 
-        ? 0.0 
-        : Curves.easeOutCubic.transform((progress - initialPause) / (1 - initialPause)).clamp(0.0, 1.0);
-    
-    // Daha smooth scale animasyonu
-    final scaleProgress = Curves.easeOutCubic.transform(delayedProgress);
-    final targetScale = 40.0; // Daha makul bir maksimum scale
-    final currentScale = baseScale + (targetScale * scaleProgress);
+    final double delayedProgress = _calculateDelayedProgress(progress);
+    final double currentScale = _calculateScale(baseScale, delayedProgress);
+    final double glowProgress = _calculateGlowProgress(progress);
+    final double pulseEffect = _calculatePulseEffect(progress);
 
-    // Daha yumuşak glow efekti
-    final glowProgress = progress > (1 - glowDuration)
+    return Material(
+      color: Colors.transparent,
+      child: Center(
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            _buildGlowEffect(color, glowProgress),
+            _buildFingerCircle(color, currentScale, pulseEffect, delayedProgress),
+            _buildFingerNumber(fingerNumber, currentScale, pulseEffect),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static double _calculateDelayedProgress(double progress) {
+    const double initialPause = 0.3;
+    return progress < initialPause
+        ? 0.0
+        : Curves.easeOutCubic.transform((progress - initialPause) / (1 - initialPause)).clamp(0.0, 1.0);
+  }
+
+  static double _calculateScale(double baseScale, double progress) {
+    const double targetScale = 25.0;
+    return baseScale + (targetScale * progress);
+  }
+
+  static double _calculateGlowProgress(double progress) {
+    const double glowDuration = 0.7;
+    return progress > (1 - glowDuration)
         ? Curves.easeInOut.transform((progress - (1 - glowDuration)) / glowDuration).clamp(0.0, 1.0)
         : 0.0;
-    final glowIntensity = glowProgress;
+  }
 
-    // Daha hafif pulse efekti
-    final pulseEffect = progress > 0.6 
-        ? sin((progress - 0.6) * 3 * pi) * 0.05 * (1 - ((progress - 0.6) / 0.4))
+  static double _calculatePulseEffect(double progress) {
+    return progress > 0.6 
+        ? sin((progress - 0.6) * 3 * pi) * 0.03 * (1 - ((progress - 0.6) / 0.4))
         : 0.0;
+  }
 
-    return Center(
-      child: Transform.scale(
-        scale: currentScale + pulseEffect,
+  static Widget _buildGlowEffect(Color color, double glowProgress) {
+    return glowProgress > 0
+        ? Container(
+            width: GameScreen.kFingerSize * 2,
+            height: GameScreen.kFingerSize * 2,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: color.withOpacity(0.3 * glowProgress),
+                  blurRadius: 30,
+                  spreadRadius: 15,
+                ),
+              ],
+            ),
+          )
+        : const SizedBox();
+  }
+
+  static Widget _buildFingerCircle(Color color, double scale, double pulse, double progress) {
+    return Transform.scale(
+      scale: scale + pulse,
+      child: Container(
+        width: GameScreen.kFingerSize,
+        height: GameScreen.kFingerSize,
+        decoration: BoxDecoration(
+          color: color,
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: Colors.white.withOpacity(0.9 - (0.4 * progress)),
+            width: 4.0 * (1.0 - (0.3 * progress)),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.4 * (1 - progress)),
+              blurRadius: 20,
+              spreadRadius: 10,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static Widget _buildFingerNumber(int fingerNumber, double scale, double pulse) {
+    return Transform.scale(
+      scale: scale + pulse,
+      child: Container(
+        width: GameScreen.kFingerSize,
+        height: GameScreen.kFingerSize,
         alignment: Alignment.center,
-        child: Container(
-          width: GameScreen.kFingerSize,
-          height: GameScreen.kFingerSize,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              // Optimize edilmiş glow efekti
-              if (glowProgress > 0) Container(
-                width: GameScreen.kFingerSize * 1.3,
-                height: GameScreen.kFingerSize * 1.3,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: color.withOpacity(0.3 * glowIntensity),
-                      blurRadius: 30 * (1 + glowIntensity),
-                      spreadRadius: 15 * glowIntensity,
-                    ),
-                  ],
+        padding: EdgeInsets.only(bottom: GameScreen.kFingerSize * 0.05),
+        child: FittedBox(
+          fit: BoxFit.contain,
+          child: Text(
+            fingerNumber.toString(),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: GameScreen.kFingerSize * 0.35,
+              fontFamily: GameScreen.kFontFamily,
+              fontWeight: FontWeight.bold,
+              height: 1,
+              shadows: [
+                Shadow(
+                  color: Colors.black26,
+                  blurRadius: 2,
+                  offset: Offset(1, 1),
                 ),
-              ),
-              // Ana circle container
-              Container(
-                width: GameScreen.kFingerSize,
-                height: GameScreen.kFingerSize,
-                decoration: BoxDecoration(
-                  color: color,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.9 - (0.4 * scaleProgress)),
-                    width: 4.0 * (1.0 - (0.5 * scaleProgress)),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: color.withOpacity(0.4 * (1 - scaleProgress)),
-                      blurRadius: 20 * (1.0 + scaleProgress),
-                      spreadRadius: 10 * (1.0 + scaleProgress),
-                    ),
-                    if (glowProgress > 0) BoxShadow(
-                      color: Colors.white.withOpacity(0.3 * glowIntensity),
-                      blurRadius: 15 * glowIntensity,
-                      spreadRadius: 5 * glowIntensity,
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: Transform.scale(
-                    scale: 1.0 + (scaleProgress * 0.3),
-                    child: Text(
-                      fingerNumber.toString(),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: GameScreen.kFingerSize * 0.4,
-                        fontFamily: GameScreen.kFontFamily,
-                        fontWeight: FontWeight.bold,
-                        height: 1,
-                        shadows: [
-                          Shadow(
-                            color: Colors.black26,
-                            blurRadius: 2,
-                            offset: Offset(1, 1),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
-} 
+}
