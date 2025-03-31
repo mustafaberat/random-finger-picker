@@ -5,6 +5,7 @@ import 'package:confetti/confetti.dart';
 import '../animations/finger_tap_animation.dart';
 import '../animations/winner_animation.dart';
 import '../animations/selection_animation.dart';
+import '../animations/confetti_animation.dart';
 import '../managers/game_manager.dart';
 import '../managers/animation_manager.dart';
 import '../services/localization_service.dart';
@@ -272,53 +273,10 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
             ),
 
             // Confetti
-            if (_gameManager.isWinAnimationPlaying) ...[
-              Align(
-                alignment: Alignment.topCenter,
-                child: ConfettiWidget(
-                  confettiController: _confettiController,
-                  blastDirection: pi / 2,
-                  maxBlastForce: 3,
-                  minBlastForce: 1,
-                  emissionFrequency: 0.03,
-                  numberOfParticles: 20,
-                  gravity: 0.3,
-                  shouldLoop: false,
-                  particleDrag: 0.05,
-                  colors: GameScreen.kGameColors,
-                ),
-              ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: ConfettiWidget(
-                  confettiController: _confettiController,
-                  blastDirection: 0,
-                  maxBlastForce: 3,
-                  minBlastForce: 1,
-                  emissionFrequency: 0.03,
-                  numberOfParticles: 20,
-                  gravity: 0.3,
-                  shouldLoop: false,
-                  particleDrag: 0.05,
-                  colors: GameScreen.kGameColors,
-                ),
-              ),
-              Align(
-                alignment: Alignment.centerRight,
-                child: ConfettiWidget(
-                  confettiController: _confettiController,
-                  blastDirection: pi,
-                  maxBlastForce: 3,
-                  minBlastForce: 1,
-                  emissionFrequency: 0.03,
-                  numberOfParticles: 20,
-                  gravity: 0.3,
-                  shouldLoop: false,
-                  particleDrag: 0.05,
-                  colors: GameScreen.kGameColors,
-                ),
-              ),
-            ],
+            ConfettiAnimation(
+              controller: _confettiController,
+              isPlaying: _gameManager.isWinAnimationPlaying,
+            ),
 
             // Gesture Detector and UI
             Listener(
