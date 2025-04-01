@@ -217,13 +217,23 @@ class GameManager {
   }
 
   Color _getNextColor() {
-    // Find the next available number
+    // Create a set of already used colors
+    final Set<Color> usedColors = fingerColors.values.toSet();
+    
+    // Try to find a color that isn't already in use
+    for (Color color in GameConstants.kGameColors) {
+      if (!usedColors.contains(color)) {
+        return color;
+      }
+    }
+    
+    // If all colors are used (this should rarely happen with 10 colors and 10 max fingers),
+    // fall back to getting a color based on the next key number
     int nextKey = 1;
     while (fingers.containsKey(nextKey)) {
       nextKey++;
     }
     
-    // Use nextKey directly as index (subtract 1 to convert from 1-based to 0-based indexing)
     int colorIndex = (nextKey - 1) % GameConstants.kGameColors.length;
     return GameConstants.kGameColors[colorIndex];
   }
