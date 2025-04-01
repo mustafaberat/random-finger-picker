@@ -92,8 +92,6 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   }
 
   void _onFinishSelection() {
-    print(
-        "🎊 Finish selection - Starting win animation for finger: ${_gameManager.selectedFinger}");
     setState(() {
       // Kazanan parmak UI'da güncellendi
     });
@@ -102,14 +100,10 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     Future.delayed(Duration(milliseconds: 100), () {
       _animationManager.startWinAnimation();
       _confettiController.play();
-      print(
-          "🎉 Win animation started for finger: ${_gameManager.selectedFinger}");
     });
   }
 
   void _onSelectionComplete() {
-    print(
-        "🌟 Selection completed - Winning finger: ${_gameManager.selectedFinger}");
     _gameManager.finishSelection();
   }
 

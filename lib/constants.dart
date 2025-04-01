@@ -29,7 +29,6 @@ class GameConstants {
   // Common animation properties
   static const double kMaxScale = 1.4;
   static const double kFinalScale = 1.0;
-  static const double kPulseScaleFactor = 0.3;
   static const double kBorderWidth = 3.0;
   static const double kOuterBorderWidth = 4.0;
   static const double kOuterBorderScale = 1.30;
