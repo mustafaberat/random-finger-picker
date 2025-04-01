@@ -209,7 +209,6 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                               if (_gameManager.isSelecting) {
                                 return SelectionAnimation.build(
                                   color: fingerColor,
-                                  baseScale: baseScale,
                                   isSelected: isSelected,
                                   selectionProgress: _animationManager
                                       .selectionController.value,

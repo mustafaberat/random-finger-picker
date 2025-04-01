@@ -27,8 +27,8 @@ class GameConstants {
   static const Duration kGameResetDelay = Duration(seconds: 3);
 
   // Common animation properties
-  static const double kMaxScale = 1.4;
-  static const double kFinalScale = 1.0;
+  static const double kMaxScale = 2.0;
+  static const double kFinalScale = 1.2;
   static const double kBorderWidth = 3.0;
   static const double kOuterBorderWidth = 4.0;
   static const double kOuterBorderScale = 1.30;

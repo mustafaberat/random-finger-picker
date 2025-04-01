@@ -52,8 +52,8 @@ class FingerCircle extends StatelessWidget {
       return baseScale!;
     }
 
-    // Default scale
-    return 1.0;
+    // Default scale - selection animation
+    return GameConstants.kFinalScale;
   }
 
   @override

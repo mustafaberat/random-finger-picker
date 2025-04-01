@@ -80,7 +80,6 @@ class SelectionAnimation {
 
   static Widget build({
     required Color color,
-    required double baseScale,
     required bool isSelected,
     required double selectionProgress,
     required int fingerIndex,
@@ -201,11 +200,11 @@ class SelectionAnimation {
       print('HIGHLIGHT - Gösterilen Parmak: ${fingerIndex + 1} | Progress: ${_totalProgress.toStringAsFixed(2)} | Speed: ${_currentSpeed.toStringAsFixed(2)}');
     }
 
-    return _buildAnimatedFinger(color, baseScale, isLit, baseOpacity, fingerNumber);
+    return _buildAnimatedFinger(color, isLit, baseOpacity, fingerNumber);
   }
 
   // Animasyonlu parmak widget'ını oluştur
-  static Widget _buildAnimatedFinger(Color color, double baseScale, bool isLit, double baseOpacity, int fingerNumber) {
+  static Widget _buildAnimatedFinger(Color color, bool isLit, double baseOpacity, int fingerNumber) {
     // Eğer tamamen durduysa ve seçilen parmak varsa, sadece kazanan parmağa özel efekt ver
     final bool isSelected = _isAnimationStopped && isLit && _selectedFinger != null;
     
@@ -216,7 +215,6 @@ class SelectionAnimation {
 
     return FingerCircle(
       color: color,
-      baseScale: baseScale,
       fingerNumber: fingerNumber,
       borderOpacity: borderOpacity,
       isLit: isLit,
