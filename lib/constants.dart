@@ -9,7 +9,6 @@ class GameConstants {
 
   // Game colors
   static const List<Color> kGameColors = [
-    Colors.brown,
     Colors.red,
     Colors.blue,
     Colors.yellow,
@@ -17,6 +16,7 @@ class GameConstants {
     Colors.orange,
     Colors.purple,
     Colors.green,
+    Colors.brown,
     Colors.cyan,
     Colors.pink,
   ];
