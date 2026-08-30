@@ -1,0 +1,22 @@
+---
+description: Ortak Flutter scriptleri mobile-apps/lib'den oku; oyuna kopyalama
+alwaysApply: true
+---
+
+# Shared scripts
+
+Release, web ve cihaz yükleme scriptleri bu repoda yok. Kaynak:
+
+`/Users/mustafaberataru/Projects/personal/mobile-apps/lib/scripts/`
+
+Oyun kökünden:
+
+```bash
+APP_ROOT=. ../lib/scripts/build_play.sh
+APP_ROOT=. ../lib/scripts/run_web.sh
+APP_ROOT=. ../lib/scripts/install_release.sh
+```
+
+- Bu scriptleri `scripts/` altına kopyalama veya sarmalayıcı yazma.
+- Düzeltme sadece `mobile-apps/lib/scripts/` içinde.
+- Oyuna özel kalanlar (ikon, Play screenshot) burada durabilir.
